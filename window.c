@@ -15,14 +15,14 @@ void keyinput_handler (WINDOW *p_win, int ch) {
 		case KEY_DOWN:
 			if (checkbounds(x,y+1)) wmove(p_win, y+1, x);
 			break;
-		case KEY_LEFT:
+		/*case KEY_LEFT:
 			if (checkbounds(x-1,y)) wmove(p_win, y, x-1);
 			break;
 		case KEY_RIGHT:
 			if (checkbounds(x+1,y)) wmove(p_win, y, x+1);
 			break;
 		default:
-			break;
+			break;*/
 	}
 }
 

@@ -1,9 +1,21 @@
 #include <signal.h>
 #include <stdlib.h>
 #include "window.h"
+#include "linked_list_proc.h"
+#include <pthread.h>
+#include <unistd.h>
 
 void sigint_handler (int sig) {
 	quit_flag = 1;
+}
+
+void *thread_func (void *arg) {
+	while (!quit_flag) {
+		WINDOW* w_body = (WINDOW*)arg;
+		int ch = wgetch(w_body);
+		keyinput_handler(w_body, ch);
+	}
+	return NULL;
 }
 
 int main() {
@@ -15,7 +27,7 @@ int main() {
 		printf("Your terminal does not support colors. Boring...\nQuitting.\n");
 		exit(1);
 	}
-	start_color();
+	//start_color();
 	raw();
 	noecho();
 	WINDOW* w_header = newwin(9, COLS, 0, 0);
@@ -36,20 +48,24 @@ int main() {
 	wrefresh(w_footer);
 	wmove(w_body, 0, 2);
 	wrefresh(w_body);
+	ListHead listProcesses;
+	List_init(&listProcesses);
 	int i = 0;
+	pthread_t thread;
+	pthread_create(&thread, NULL, thread_func, w_body);
 	while(1) {
 		if(quit_flag) {
 			break;
 		}
-		int ch = wgetch(w_body);
-		keyinput_handler(w_body, ch);
-		i++;
+		readProcs(&listProcesses);
 		wrefresh(w_body);
+		usleep(1000000);
 	}
 	delwin(w_header);
 	delwin(w_body);
 	delwin(w_footer);
 	endwin();
+	pthread_join(thread, NULL);
 	return 0;
 }
 
