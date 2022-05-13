@@ -9,8 +9,6 @@
 #include <ctype.h>
 #include <pwd.h>
 
-int time_total_after=0, time_total_before=0;
-
 void ListItem_construct(ListItem* item, ListItemOps* ops) {
     item->prev=item->next=0;
     item->ops=ops;
@@ -127,18 +125,22 @@ int checkIfPidExists(ListHead* head, int pid) {
     return 0;
 }
 
-void readProcs(ListHead* head){
+void readProcs(ListHead* head, WINDOW* w_body){
+	long long int time_total_before = 0, time_total_after = 0;
+    calculateTotalCPUTime(&time_total_before, &time_total_after);
 	char *path_proc[] = { "/proc", NULL };
     FTS* fts_proc = fts_open(path_proc, FTS_PHYSICAL | FTS_NOSTAT, NULL);
 	FTSENT* node;
     if (NULL != fts_proc) {
 		while (NULL != (node = fts_read(fts_proc))) {
-			if (node->fts_info & FTS_F) {
-				for (int i = 0; i < node->fts_namelen; i++) {
-					if (!isdigit(node->fts_name[i])) {
-						continue;
-					}
+			int check = 0;
+			for (const char* p =node->fts_name; *p; p++) {
+				if (!isdigit(*p)) {
+					check = 1;
+					break;
 				}
+			}
+			if (!check) {
 				int pid = atoi(node->fts_name);
 				int uid = 0;
 				char pathUid[100];
@@ -157,12 +159,16 @@ void readProcs(ListHead* head){
 					item->process->pid = pid;
 					calculateProcessTime(item->process);
 					item->process->uid = uid;
-					item->process->cpu_usage = 100 * (item->process->utime_after - item->process->utime_before) / (time_total_after - time_total_before);
+					long long int utime = 100 * (item->process->utime_after - item->process->utime_before) / (time_total_after - time_total_before);
+					long long int stime = 100 * (item->process->stime_after - item->process->stime_before) / (time_total_after - time_total_before);
+					item->process->cpu_usage = utime + stime;
 					item->process->mem_usage = 0;
 					List_insert(head, 0, (ListItem*)item);
 				}
 			}
-			fts_set(fts_proc, node, FTS_SKIP);
+			if (strcmp(node->fts_name, "proc")){
+				fts_set(fts_proc, node, FTS_SKIP);
+			}
 		}
 	fts_close(fts_proc);
 	}
@@ -172,7 +178,7 @@ void readProcs(ListHead* head){
 	}
 }
 
-void calculateTotalCPUTime(){
+void calculateTotalCPUTime(long long int* time_total_before, long long int* time_total_after) {
 	FILE* fCPUStat = fopen("/proc/stat", "r");
 	if (fCPUStat == NULL) {
 		perror("fopen");
@@ -188,8 +194,8 @@ void calculateTotalCPUTime(){
 		totalCPU += atoi(token);
 		token = strtok(NULL, " ");
 	}
-	time_total_before = time_total_after;
-	time_total_after = totalCPU;
+	*time_total_before = *time_total_after;
+	*time_total_after = totalCPU;
 }
 
 void calculateProcessTime(PROCESS* item){

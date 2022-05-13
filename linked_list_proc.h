@@ -1,4 +1,5 @@
 #pragma once
+#include <ncurses.h>
 
 struct ListItem;
 
@@ -38,10 +39,10 @@ typedef struct process {
 	int uid;
 	int cpu_usage;
 	int mem_usage;
-	int utime_before;
-	int stime_before;
-	int utime_after;
-	int stime_after;
+	long long int utime_before;
+	long long int stime_before;
+	long long int utime_after;
+	long long int stime_after;
 } PROCESS;
 
 typedef struct {
@@ -50,8 +51,6 @@ typedef struct {
 } ListItemProcess;
 
 int checkIfPidExists(ListHead* head, int pid);
-void readProcs(ListHead* head);
-void calculateTotalCPUTime();
+void readProcs(ListHead* head,WINDOW* w_body);
+void calculateTotalCPUTime(long long int* time_total_before, long long int* time_total_after);
 void calculateProcessTime(PROCESS* item);
-
-extern int time_total_after,time_total_before;
