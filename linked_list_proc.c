@@ -155,6 +155,8 @@ void readProcs(ListHead* head, WINDOW* w_body){
 				}
 				if (pid > 0 && !checkIfPidExists(head, pid)) {
 					ListItemProcess* item = (ListItemProcess*)malloc(sizeof(ListItemProcess));
+					ListItem* aux = (ListItem*)item;
+                    aux->prev = aux->next = 0;
 					item->process = (PROCESS*)malloc(sizeof(PROCESS));
 					item->process->pid = pid;
 					calculateProcessTime(item->process);
@@ -163,7 +165,7 @@ void readProcs(ListHead* head, WINDOW* w_body){
 					long long int stime = 100 * (item->process->stime_after - item->process->stime_before) / (time_total_after - time_total_before);
 					item->process->cpu_usage = utime + stime;
 					item->process->mem_usage = 0;
-					List_insert(head, 0, (ListItem*)item);
+					List_insert(head, NULL, (ListItem*)item);
 				}
 			}
 			if (strcmp(node->fts_name, "proc")){

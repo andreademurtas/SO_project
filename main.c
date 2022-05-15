@@ -28,17 +28,20 @@ void *thread_processes_func(void *arg) {
 	PROCESSthread_arg_t* arg_t = (PROCESSthread_arg_t*)arg;
 	ListHead* list_head = arg_t->list_head;
 	WINDOW* w_body = arg_t->w_body;
+	int x, y;
 	while (!quit_flag) {
+		sem_wait(&sem_keyinput);
+		getyx(w_body, y, x);
 		readProcs(list_head, w_body);
-		wprintw(w_body, "Processes:\n");
+		werase(w_body);
+		wprintw(w_body, "  Processes:\n");
 		ListItemProcess* item = (ListItemProcess*)list_head->first;
 		while (item != NULL) {
-			wprintw(w_body, "HERE\n");
-			wprintw(w_body, "PID: %d\n", item->process->pid);
+			wprintw(w_body, "  PID: %d    UID: %d    CPU USAGE: %lld\n", item->process->pid, item->process->uid, item->process->cpu_usage);
             ListItem* aux = (ListItem*)item;
 			item = (ListItemProcess*)aux->next;
 		}
-		sem_wait(&sem_keyinput);
+		wmove(w_body, y, x);
 		wrefresh(w_body);
 		sem_post(&sem_keyinput);
 		usleep(3000000);
@@ -55,7 +58,7 @@ int main() {
 		printf("Your terminal does not support colors. Boring...\nQuitting.\n");
 		exit(1);
 	}
-	//start_color();
+	start_color();
 	raw();
 	noecho();
 	WINDOW* w_header = newwin(9, COLS, 0, 0);
@@ -99,6 +102,12 @@ int main() {
 	sem_destroy(&sem_keyinput);
 	pthread_join(thread_keyinput, NULL);
 	pthread_join(thread_processes, NULL);
+	ListItem* curr = (&listProcesses)->first;
+	while (curr != NULL) {
+		ListItem* aux = curr;
+	    curr = curr->next;
+	    free(aux);
+	}
 	return 0;
 }
 
