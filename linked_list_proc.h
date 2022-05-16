@@ -43,6 +43,7 @@ typedef struct process {
 	long long int stime_before;
 	long long int utime_after;
 	long long int stime_after;
+	int still_running;
 } PROCESS;
 
 typedef struct {
@@ -54,3 +55,4 @@ int checkIfPidExists(ListHead* head, int pid);
 void readProcs(ListHead* head,WINDOW* w_body);
 void calculateTotalCPUTime(long long int* time_total_before, long long int* time_total_after);
 void calculateProcessTime(PROCESS* item);
+ListItemProcess* findByPid(ListHead* head, int pid);

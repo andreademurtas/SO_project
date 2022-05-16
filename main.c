@@ -80,7 +80,6 @@ int main() {
 	wrefresh(w_body);
 	ListHead listProcesses;
 	List_init(&listProcesses);
-	int i = 0;
 	pthread_t thread_keyinput;
 	pthread_t thread_processes;
 	sem_init(&sem_keyinput, 0, 1);
@@ -106,6 +105,7 @@ int main() {
 	while (curr != NULL) {
 		ListItem* aux = curr;
 	    curr = curr->next;
+		free(((ListItemProcess*)aux)->process);
 	    free(aux);
 	}
 	return 0;

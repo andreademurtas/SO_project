@@ -131,7 +131,13 @@ void readProcs(ListHead* head, WINDOW* w_body){
 	char *path_proc[] = { "/proc", NULL };
     FTS* fts_proc = fts_open(path_proc, FTS_PHYSICAL | FTS_NOSTAT, NULL);
 	FTSENT* node;
+	ListItemProcess* item = (ListItemProcess*)head->first;
+	while (item) {
+		item->process->still_running = 0;
+		item = (ListItemProcess*)(((ListItem*)item)->next);
+	}
     if (NULL != fts_proc) {
+		int i = 0;
 		while (NULL != (node = fts_read(fts_proc))) {
 			int check = 0;
 			for (const char* p =node->fts_name; *p; p++) {
@@ -153,7 +159,10 @@ void readProcs(ListHead* head, WINDOW* w_body){
 				else {
 					continue;
 				}
-				if (pid > 0 && !checkIfPidExists(head, pid)) {
+				if (i==1) {i=0; continue;}
+				if (i==0) i=1;
+				int exists = checkIfPidExists(head, pid);
+				if (pid > 0 && !exists) {
 					ListItemProcess* item = (ListItemProcess*)malloc(sizeof(ListItemProcess));
 					ListItem* aux = (ListItem*)item;
                     aux->prev = aux->next = 0;
@@ -165,7 +174,16 @@ void readProcs(ListHead* head, WINDOW* w_body){
 					long long int stime = 100 * (item->process->stime_after - item->process->stime_before) / (time_total_after - time_total_before);
 					item->process->cpu_usage = utime + stime;
 					item->process->mem_usage = 0;
+					item->process->still_running = 1;
 					List_insert(head, NULL, (ListItem*)item);
+				}
+				else if (exists) {
+					ListItemProcess* item = findByPid(head, pid);
+					calculateProcessTime(item->process);
+					long long int utime = 100 * (item->process->utime_after - item->process->utime_before) / (time_total_after - time_total_before);
+					long long int stime = 100 * (item->process->stime_after - item->process->stime_before) / (time_total_after - time_total_before);
+					item->process->cpu_usage = utime + stime;
+					item->process->still_running = 1;
 				}
 			}
 			if (strcmp(node->fts_name, "proc")){
@@ -177,6 +195,16 @@ void readProcs(ListHead* head, WINDOW* w_body){
 	else {
 		perror("fts_open");
 		exit(EXIT_FAILURE);
+	}
+	item = (ListItemProcess*)head->first;
+	while (item) {
+		ListItemProcess* next = (ListItemProcess*)(((ListItem*)item)->next);
+		if (!item->process->still_running) {
+			List_detach(head, (ListItem*)item);
+			free(item->process);
+			free(item);
+		}
+		item = next;
 	}
 }
 
@@ -225,4 +253,14 @@ void calculateProcessTime(PROCESS* item){
 	item->utime_after = utime;
 	item->stime_before = item->stime_after;
 	item->stime_after = stime;
+}
+
+ListItemProcess* findByPid(ListHead* head, int pid) {
+    ListItem* item = head->first;
+	while(item) {
+		if (((ListItemProcess*)item)->process->pid==pid)
+			return (ListItemProcess*)item;
+		item=item->next;
+	}
+	return NULL;
 }
