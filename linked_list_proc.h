@@ -56,3 +56,4 @@ void readProcs(ListHead* head,WINDOW* w_body);
 void calculateTotalCPUTime(long long int* time_total_before, long long int* time_total_after);
 void calculateProcessTime(PROCESS* item);
 ListItemProcess* findByPid(ListHead* head, int pid);
+int getNumberOfProcesses(ListHead* head);

@@ -58,7 +58,7 @@ ListItem* List_insert(ListHead* head, ListItem* prev, ListItem* item) {
       ListItem* prev_instance=List_find(head, prev);
       assert(prev_instance);
     }
-    // we check that the previous is inthe list
+    // we check that the previous is in the list
 #endif
 
     ListItem* next= prev ? prev->next : head->first;
@@ -263,4 +263,14 @@ ListItemProcess* findByPid(ListHead* head, int pid) {
 		item=item->next;
 	}
 	return NULL;
+}
+
+int getNumberOfProcesses(ListHead* head) {
+	ListItem* item = head->first;
+	int count = 0;
+	while (item) {
+		count++;
+		item = item->next;
+	}
+	return count;
 }

@@ -10,19 +10,26 @@ void sigint_handler (int sig) {
 	quit_flag = 1;
 }
 
-void *thread_keyinput_func (void *arg) {
-	while (!quit_flag) {
-		WINDOW* w_body = (WINDOW*)arg;
-		int ch = wgetch(w_body);
-		keyinput_handler(w_body, ch);
-	}
-	return NULL;
-}
-
 typedef struct {
 	WINDOW* w_body;
 	ListHead* list_head;
 } PROCESSthread_arg_t;
+
+void *thread_keyinput_func (void *arg) {
+	PROCESSthread_arg_t* args = (PROCESSthread_arg_t*) arg;
+	int nprocs = 0;
+	while (!quit_flag) {
+		sem_wait(&sem_readprocs);
+		nprocs = getNumberOfProcesses(args->list_head);
+		sem_post(&sem_readprocs);
+		WINDOW* w_body = args->w_body;
+		int ch = wgetch(w_body);
+		keyinput_handler(w_body, ch, nprocs);
+	}
+	return NULL;
+}
+
+
 
 void *thread_processes_func(void *arg) {
 	PROCESSthread_arg_t* arg_t = (PROCESSthread_arg_t*)arg;
@@ -32,7 +39,9 @@ void *thread_processes_func(void *arg) {
 	while (!quit_flag) {
 		sem_wait(&sem_keyinput);
 		getyx(w_body, y, x);
+		sem_wait(&sem_readprocs);
 		readProcs(list_head, w_body);
+		sem_post(&sem_readprocs);
 		werase(w_body);
 		wprintw(w_body, "  Processes:\n");
 		ListItemProcess* item = (ListItemProcess*)list_head->first;
@@ -83,9 +92,11 @@ int main() {
 	pthread_t thread_keyinput;
 	pthread_t thread_processes;
 	sem_init(&sem_keyinput, 0, 1);
-	PROCESSthread_arg_t arg_t = {w_body, &listProcesses};
-	pthread_create(&thread_keyinput, NULL, thread_keyinput_func, w_body);
-	pthread_create(&thread_processes, NULL, thread_processes_func, &arg_t);
+	sem_init(&sem_readprocs, 0, 1);
+	PROCESSthread_arg_t arg_proc = {w_body, &listProcesses};
+	PROCESSthread_arg_t arg_keyinput = {w_body, &listProcesses};
+	pthread_create(&thread_keyinput, NULL, thread_keyinput_func, &arg_keyinput);
+	pthread_create(&thread_processes, NULL, thread_processes_func, &arg_proc);
 	while(1) {
 		if(quit_flag) {
 			break;
