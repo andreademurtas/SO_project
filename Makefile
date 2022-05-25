@@ -1,5 +1,5 @@
 CC:=gcc
-CFLAGS:=-lpthread -lncurses -Wall
+CFLAGS:=-lpthread -lncurses -Wall -g
 DEPS:=window.h linked_list_proc.h
 
 %.o: %.c $(DEPS)

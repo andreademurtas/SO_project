@@ -6,6 +6,8 @@
 #include <unistd.h>
 #include <semaphore.h>
 
+static char* banner = "  _     _                     _                  \n | |   | |                   | |                 \n | |__ | |_ ___  _ __     ___| | ___  _ __   ___ \n | \'_ \\| __/ _ \\| \'_ \\   / __| |/ _ \\| \'_ \\ / _ \\\n | | | | || (_) | |_) | | (__| | (_) | | | |  __/\n |_| |_|\\__\\___/| .__/   \\___|_|\\___/|_| |_|\\___|\n                | |                              \n                |_|                              ";
+
 void sigint_handler (int sig) {
 	quit_flag = 1;
 }
@@ -37,6 +39,7 @@ void *thread_processes_func(void *arg) {
 	WINDOW* w_body = arg_t->w_body;
 	int x, y;
 	while (!quit_flag) {
+		usleep(200000);
 		sem_wait(&sem_keyinput);
 		getyx(w_body, y, x);
 		sem_wait(&sem_readprocs);
@@ -53,7 +56,7 @@ void *thread_processes_func(void *arg) {
 		wmove(w_body, y, x);
 		wrefresh(w_body);
 		sem_post(&sem_keyinput);
-		usleep(3000000);
+		usleep(4000000);
 	}
 	return NULL;
 }
@@ -70,20 +73,26 @@ int main() {
 	start_color();
 	raw();
 	noecho();
-	WINDOW* w_header = newwin(9, COLS, 0, 0);
+	WINDOW* w_header_wrapper = newwin(9, COLS, 0, 0);
+	WINDOW* w_header = newwin(7, COLS-2, 1, 2);
 	WINDOW* w_body_wrapper = newwin(LINES-12, COLS, 9, 0);
 	WINDOW* w_body = newwin(LINES-14, COLS-2, 10, 1);
-	WINDOW* w_footer = newwin(3, COLS, LINES-3, 0);
+	WINDOW* w_footer_wrapper = newwin(3, COLS, LINES-3, 0);
+	WINDOW* w_footer = newwin(1, COLS-2, LINES-2, 1);
 	keypad(w_body, TRUE);
 	scrollok(w_body, TRUE);
 	idlok(w_body, TRUE);
 	wsetscrreg(w_body, 1, LINES-14);
-	box(w_header, 0, 0);
+	box(w_header_wrapper, 0, 0);
 	box(w_body_wrapper, 0, 0);
-	box(w_footer, 0, 0);
+	box(w_footer_wrapper, 0, 0);
+	wprintw(w_header, "%s", banner);
+	wprintw(w_footer, "(F1) - Terminate        (F2) - Kill        (F3) - Suspend       (F4) - Resume\n");
+	wrefresh(w_header_wrapper);
 	wrefresh(w_header);
 	wrefresh(w_body_wrapper);
 	wrefresh(w_body);
+	wrefresh(w_footer_wrapper);
 	wrefresh(w_footer);
 	wmove(w_body, 1, 2);
 	wrefresh(w_body);

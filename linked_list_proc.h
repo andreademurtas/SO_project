@@ -37,12 +37,11 @@ void List_print(ListHead* head);
 typedef struct process {
 	int pid;
 	int uid;
-	int cpu_usage;
+	unsigned int cpu_usage;
 	int mem_usage;
-	long long int utime_before;
-	long long int stime_before;
-	long long int utime_after;
-	long long int stime_after;
+	unsigned int utime;
+	unsigned int stime;
+	unsigned int start_time;
 	int still_running;
 } PROCESS;
 
@@ -53,7 +52,7 @@ typedef struct {
 
 int checkIfPidExists(ListHead* head, int pid);
 void readProcs(ListHead* head,WINDOW* w_body);
-void calculateTotalCPUTime(long long int* time_total_before, long long int* time_total_after);
+void calculateTotalCPUTime(unsigned int* total_time);
 void calculateProcessTime(PROCESS* item);
 ListItemProcess* findByPid(ListHead* head, int pid);
 int getNumberOfProcesses(ListHead* head);

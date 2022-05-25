@@ -8,6 +8,7 @@
 #include <fts.h>
 #include <ctype.h>
 #include <pwd.h>
+#include <unistd.h>
 
 void ListItem_construct(ListItem* item, ListItemOps* ops) {
     item->prev=item->next=0;
@@ -126,8 +127,8 @@ int checkIfPidExists(ListHead* head, int pid) {
 }
 
 void readProcs(ListHead* head, WINDOW* w_body){
-	long long int time_total_before = 0, time_total_after = 0;
-    calculateTotalCPUTime(&time_total_before, &time_total_after);
+	unsigned int total_time = 0;
+    calculateTotalCPUTime(&total_time);
 	char *path_proc[] = { "/proc", NULL };
     FTS* fts_proc = fts_open(path_proc, FTS_PHYSICAL | FTS_NOSTAT, NULL);
 	FTSENT* node;
@@ -170,9 +171,11 @@ void readProcs(ListHead* head, WINDOW* w_body){
 					item->process->pid = pid;
 					calculateProcessTime(item->process);
 					item->process->uid = uid;
-					long long int utime = 100 * (item->process->utime_after - item->process->utime_before) / (time_total_after - time_total_before);
-					long long int stime = 100 * (item->process->stime_after - item->process->stime_before) / (time_total_after - time_total_before);
-					item->process->cpu_usage = utime + stime;
+					unsigned int heartz = sysconf(_SC_CLK_TCK);
+					unsigned int seconds = total_time  - item->process->start_time;
+					unsigned int tot_proc = (item->process->utime + item->process->stime) / heartz;
+					unsigned int cpu_usage = 100 * (tot_proc / seconds);
+					item->process->cpu_usage = cpu_usage;
 					item->process->mem_usage = 0;
 					item->process->still_running = 1;
 					List_insert(head, NULL, (ListItem*)item);
@@ -180,9 +183,11 @@ void readProcs(ListHead* head, WINDOW* w_body){
 				else if (exists) {
 					ListItemProcess* item = findByPid(head, pid);
 					calculateProcessTime(item->process);
-					long long int utime = 100 * (item->process->utime_after - item->process->utime_before) / (time_total_after - time_total_before);
-					long long int stime = 100 * (item->process->stime_after - item->process->stime_before) / (time_total_after - time_total_before);
-					item->process->cpu_usage = utime + stime;
+					unsigned int heartz = sysconf(_SC_CLK_TCK);
+					unsigned int seconds = total_time  - item->process->start_time;
+					unsigned int tot_proc = (item->process->utime + item->process->stime) / heartz;
+					unsigned int cpu_usage = 100 * (tot_proc / seconds);
+					item->process->cpu_usage = cpu_usage;
 					item->process->still_running = 1;
 				}
 			}
@@ -208,8 +213,8 @@ void readProcs(ListHead* head, WINDOW* w_body){
 	}
 }
 
-void calculateTotalCPUTime(long long int* time_total_before, long long int* time_total_after) {
-	FILE* fCPUStat = fopen("/proc/stat", "r");
+void calculateTotalCPUTime(unsigned int* total_time) {
+	FILE* fCPUStat = fopen("/proc/uptime", "r");
 	if (fCPUStat == NULL) {
 		perror("fopen");
 		exit(1);
@@ -218,14 +223,7 @@ void calculateTotalCPUTime(long long int* time_total_before, long long int* time
 	fgets(line, sizeof(line), fCPUStat);
 	fclose(fCPUStat);
 	char* token = strtok(line, " ");
-	token = strtok(NULL, " ");
-	int totalCPU = 0;
-	while (token != NULL) {
-		totalCPU += atoi(token);
-		token = strtok(NULL, " ");
-	}
-	*time_total_before = *time_total_after;
-	*time_total_after = totalCPU;
+	*total_time = atof(token);
 }
 
 void calculateProcessTime(PROCESS* item){
@@ -246,13 +244,19 @@ void calculateProcessTime(PROCESS* item){
 		token = strtok(NULL, " ");
 		i++;
 	}
-	int utime = atoi(token);
+	unsigned int utime = atoi(token);
 	token = strtok(NULL, " ");
-	int stime = atoi(token);
-	item->utime_before = item->utime_after;
-	item->utime_after = utime;
-	item->stime_before = item->stime_after;
-	item->stime_after = stime;
+	i++;
+	unsigned int stime = atoi(token);
+	while (i < 21) {
+		token = strtok(NULL, " ");
+		i++;
+	}
+    unsigned int start_time = atoi(token);
+    unsigned int heartz = sysconf(_SC_CLK_TCK);
+	item->utime = utime;
+	item->stime = stime;
+	item->start_time = start_time / heartz;
 }
 
 ListItemProcess* findByPid(ListHead* head, int pid) {
