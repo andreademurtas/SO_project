@@ -37,7 +37,7 @@ void List_print(ListHead* head);
 typedef struct process {
 	int pid;
 	int uid;
-	unsigned int cpu_usage;
+	float cpu_usage;
 	int mem_usage;
 	unsigned int utime;
 	unsigned int stime;
@@ -52,7 +52,7 @@ typedef struct {
 
 int checkIfPidExists(ListHead* head, int pid);
 void readProcs(ListHead* head,WINDOW* w_body);
-void calculateTotalCPUTime(unsigned int* total_time);
+void calculateTotalCPUTime(float* uptime);
 void calculateProcessTime(PROCESS* item);
 ListItemProcess* findByPid(ListHead* head, int pid);
 int getNumberOfProcesses(ListHead* head);

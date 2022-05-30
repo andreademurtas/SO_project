@@ -127,8 +127,7 @@ int checkIfPidExists(ListHead* head, int pid) {
 }
 
 void readProcs(ListHead* head, WINDOW* w_body){
-	unsigned int total_time = 0;
-    calculateTotalCPUTime(&total_time);
+	float uptime = 0;
 	char *path_proc[] = { "/proc", NULL };
     FTS* fts_proc = fts_open(path_proc, FTS_PHYSICAL | FTS_NOSTAT, NULL);
 	FTSENT* node;
@@ -140,6 +139,7 @@ void readProcs(ListHead* head, WINDOW* w_body){
     if (NULL != fts_proc) {
 		int i = 0;
 		while (NULL != (node = fts_read(fts_proc))) {
+    		calculateTotalCPUTime(&uptime);
 			int check = 0;
 			for (const char* p =node->fts_name; *p; p++) {
 				if (!isdigit(*p)) {
@@ -172,9 +172,9 @@ void readProcs(ListHead* head, WINDOW* w_body){
 					calculateProcessTime(item->process);
 					item->process->uid = uid;
 					unsigned int heartz = sysconf(_SC_CLK_TCK);
-					unsigned int seconds = total_time  - item->process->start_time;
-					unsigned int tot_proc = (item->process->utime + item->process->stime) / heartz;
-					unsigned int cpu_usage = 100 * (tot_proc / seconds);
+					unsigned int seconds = uptime  - item->process->start_time;
+					float tot_proc = ((float)item->process->utime + (float)item->process->stime) / heartz;
+					float cpu_usage = 100 * (tot_proc / seconds);
 					item->process->cpu_usage = cpu_usage;
 					item->process->mem_usage = 0;
 					item->process->still_running = 1;
@@ -184,9 +184,9 @@ void readProcs(ListHead* head, WINDOW* w_body){
 					ListItemProcess* item = findByPid(head, pid);
 					calculateProcessTime(item->process);
 					unsigned int heartz = sysconf(_SC_CLK_TCK);
-					unsigned int seconds = total_time  - item->process->start_time;
-					unsigned int tot_proc = (item->process->utime + item->process->stime) / heartz;
-					unsigned int cpu_usage = 100 * (tot_proc / seconds);
+					unsigned int seconds = uptime - item->process->start_time;
+					float tot_proc = ((float)item->process->utime + (float)item->process->stime) / heartz;
+					float cpu_usage = 100 * (tot_proc / seconds);
 					item->process->cpu_usage = cpu_usage;
 					item->process->still_running = 1;
 				}
@@ -213,7 +213,7 @@ void readProcs(ListHead* head, WINDOW* w_body){
 	}
 }
 
-void calculateTotalCPUTime(unsigned int* total_time) {
+void calculateTotalCPUTime(float* uptime) {
 	FILE* fCPUStat = fopen("/proc/uptime", "r");
 	if (fCPUStat == NULL) {
 		perror("fopen");
@@ -223,7 +223,7 @@ void calculateTotalCPUTime(unsigned int* total_time) {
 	fgets(line, sizeof(line), fCPUStat);
 	fclose(fCPUStat);
 	char* token = strtok(line, " ");
-	*total_time = atof(token);
+	*uptime = atof(token);
 }
 
 void calculateProcessTime(PROCESS* item){
