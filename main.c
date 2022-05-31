@@ -87,13 +87,13 @@ int main() {
 	if (can_change_color() == TRUE)
 	{
 		init_color(COLOR_BLACK, 400, 400, 400);
-		init_pair(1, COLOR_BLACK, COLOR_RED);
-		wattron(w_header_wrapper, COLOR_PAIR(1));
-		wattron(w_body_wrapper, COLOR_PAIR(1));
-		wattron(w_footer_wrapper, COLOR_PAIR(1));
-		wattron(w_header, COLOR_PAIR(1));
-		wattron(w_body, COLOR_PAIR(1));
-		wattron(w_footer, COLOR_PAIR(1));
+		init_pair(1, COLOR_BLACK, COLOR_BLACK);
+		//wattron(w_header_wrapper, COLOR_PAIR(1));
+		//wattron(w_body_wrapper, COLOR_PAIR(1));
+		//wattron(w_footer_wrapper, COLOR_PAIR(1));
+		//wattron(w_header, COLOR_PAIR(1));
+		//wattron(w_body, COLOR_PAIR(1));
+		//wattron(w_footer, COLOR_PAIR(1));
 	}
 	int lower_bound = 0;
 	int upper_bound = LINES-14;
@@ -125,20 +125,13 @@ int main() {
 	PROCESSthread_arg_t arg_keyinput = {w_body, &listProcesses, lower_bound, upper_bound};
 	pthread_create(&thread_keyinput, NULL, thread_keyinput_func, &arg_keyinput);
 	pthread_create(&thread_processes, NULL, thread_processes_func, &arg_proc);
-	while(1) {
-		if(quit_flag) {
-			break;
-		}
-		sem_wait(&sem_keyinput);
-		wrefresh(w_body);
-		sem_post(&sem_keyinput);
-	}
+	pthread_join(thread_keyinput, NULL);
+	pthread_join(thread_processes, NULL);
+	sem_destroy(&sem_keyinput);
+	sem_destroy(&sem_readprocs);
 	delwin(w_header);
 	delwin(w_body);
 	delwin(w_footer);
-	sem_destroy(&sem_keyinput);
-	pthread_join(thread_keyinput, NULL);
-	pthread_join(thread_processes, NULL);
 	ListItem* curr = (&listProcesses)->first;
 	while (curr != NULL) {
 		ListItem* aux = curr;
