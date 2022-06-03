@@ -1,0 +1,484 @@
+memory usage of 10245: 0.000000
+memory usage of 9578: 0.000000
+memory usage of 8790: 0.000000
+memory usage of 8779: 0.000000
+memory usage of 8771: 0.000000
+memory usage of 8469: 0.000000
+memory usage of 8468: 0.000000
+memory usage of 8467: 0.000000
+memory usage of 2225: 0.000000
+memory usage of 2131: 0.000000
+memory usage of 2130: 0.000000
+memory usage of 93: 0.000000
+memory usage of 52: 0.000000
+memory usage of 50: 0.000000
+memory usage of 1: 0.000000
+memory usage of 10245: 0.027644
+memory usage of 9578: 0.077853
+memory usage of 8790: 1.629431
+memory usage of 8779: 1.348687
+memory usage of 8771: 0.424192
+memory usage of 8469: 0.077802
+memory usage of 8468: 0.001333
+memory usage of 8467: 0.001128
+memory usage of 2225: 0.085187
+memory usage of 2131: 0.078315
+memory usage of 2130: -12.394156
+memory usage of 93: 0.872797
+memory usage of 52: 0.001077
+memory usage of 50: 1.293810
+memory usage of 1: 0.013847
+memory usage of 10245: 0.027644
+memory usage of 9578: 0.077853
+memory usage of 8790: 1.629431
+memory usage of 8779: 1.348687
+memory usage of 8771: 0.424192
+memory usage of 8469: 0.077802
+memory usage of 8468: 0.001333
+memory usage of 8467: 0.001128
+memory usage of 2225: 0.085187
+memory usage of 2131: 0.078315
+memory usage of 2130: -12.394156
+memory usage of 93: 0.872797
+memory usage of 52: 0.001077
+memory usage of 50: 1.293810
+memory usage of 1: 0.013847
+memory usage of 10250: 0.000000
+memory usage of 10249: 0.000000
+memory usage of 10248: 0.000000
+memory usage of 10245: 0.027644
+memory usage of 9578: 0.077853
+memory usage of 8790: 1.629431
+memory usage of 8779: 1.348687
+memory usage of 8771: 0.424192
+memory usage of 8469: 0.077802
+memory usage of 8468: 0.001333
+memory usage of 8467: 0.001128
+memory usage of 2225: 0.085187
+memory usage of 2131: 0.078315
+memory usage of 2130: -12.394156
+memory usage of 93: 0.872797
+memory usage of 52: 0.001077
+memory usage of 50: 1.293810
+memory usage of 1: 0.013847
+kh: sem_post(&sem_keyinput) (next instruction);
+memory usage of 10250: 0.075904
+memory usage of 10249: 0.001333
+memory usage of 10248: 0.001128
+memory usage of 10245: 0.027644
+memory usage of 9578: 0.077853
+memory usage of 8790: 1.629431
+memory usage of 8779: 1.348687
+memory usage of 8771: 0.424192
+memory usage of 8469: 0.077802
+memory usage of 8468: 0.001333
+memory usage of 8467: 0.001128
+memory usage of 2225: 0.085187
+memory usage of 2131: 0.078315
+memory usage of 2130: -12.394156
+memory usage of 93: 0.872797
+memory usage of 52: 0.001077
+memory usage of 50: 1.293810
+memory usage of 1: 0.013847
+memory usage of 10347: 0.000000
+memory usage of 10250: 0.076981
+memory usage of 10249: 0.001333
+memory usage of 10248: 0.001128
+memory usage of 10245: 0.027644
+memory usage of 9578: 0.077853
+memory usage of 8790: 1.629431
+memory usage of 8779: 1.348687
+memory usage of 8771: 0.424192
+memory usage of 8469: 0.077802
+memory usage of 8468: 0.001333
+memory usage of 8467: 0.001128
+memory usage of 2225: 0.085187
+memory usage of 2131: 0.078315
+memory usage of 2130: -12.394156
+memory usage of 93: 0.872797
+memory usage of 52: 0.001077
+memory usage of 50: 1.293810
+memory usage of 1: 0.013847
+memory usage of 10347: 0.059544
+memory usage of 10250: 0.076981
+memory usage of 10249: 0.001333
+memory usage of 10248: 0.001128
+memory usage of 10245: 0.027644
+memory usage of 9578: 0.077853
+memory usage of 8790: 1.629431
+memory usage of 8779: 1.348687
+memory usage of 8771: 0.424192
+memory usage of 8469: 0.077802
+memory usage of 8468: 0.001333
+memory usage of 8467: 0.001128
+memory usage of 2225: 0.085187
+memory usage of 2131: 0.078315
+memory usage of 2130: -12.394156
+memory usage of 93: 0.872797
+memory usage of 52: 0.001077
+memory usage of 50: 1.293810
+memory usage of 1: 0.013847
+memory usage of 10347: 0.059544
+memory usage of 10250: 0.076981
+memory usage of 10249: 0.001333
+memory usage of 10248: 0.001128
+memory usage of 10245: 0.027644
+memory usage of 9578: 0.077853
+memory usage of 8790: 1.629431
+memory usage of 8779: 1.348687
+memory usage of 8771: 0.424192
+memory usage of 8469: 0.077802
+memory usage of 8468: 0.001333
+memory usage of 8467: 0.001128
+memory usage of 2225: 0.085187
+memory usage of 2131: 0.078315
+memory usage of 2130: -12.394156
+memory usage of 93: 0.872797
+memory usage of 52: 0.001077
+memory usage of 50: 1.293810
+memory usage of 1: 0.013847
+memory usage of 10245: 0.027644
+memory usage of 9578: 0.077853
+memory usage of 8790: 1.629431
+memory usage of 8779: 1.348687
+memory usage of 8771: 0.424192
+memory usage of 8469: 0.077802
+memory usage of 8468: 0.001333
+memory usage of 8467: 0.001128
+memory usage of 2225: 0.085187
+memory usage of 2131: 0.078315
+memory usage of 2130: -12.394156
+memory usage of 93: 0.872797
+memory usage of 52: 0.001077
+memory usage of 50: 1.293810
+memory usage of 1: 0.013847
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+memory usage of 10245: 0.027644
+memory usage of 9578: 0.077853
+memory usage of 8790: 1.629431
+memory usage of 8779: 1.348687
+memory usage of 8771: 0.424192
+memory usage of 8469: 0.077802
+memory usage of 8468: 0.001333
+memory usage of 8467: 0.001128
+memory usage of 2225: 0.085187
+memory usage of 2131: 0.078315
+memory usage of 2130: -12.394156
+memory usage of 93: 0.872797
+memory usage of 52: 0.001077
+memory usage of 50: 1.293810
+memory usage of 1: 0.013847
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+memory usage of 10245: 0.029387
+memory usage of 9578: 0.077853
+memory usage of 8790: 1.629431
+memory usage of 8779: 1.348687
+memory usage of 8771: 0.424192
+memory usage of 8469: 0.077802
+memory usage of 8468: 0.001333
+memory usage of 8467: 0.001128
+memory usage of 2225: 0.085187
+memory usage of 2131: 0.078315
+memory usage of 2130: -12.394156
+memory usage of 93: 0.872797
+memory usage of 52: 0.001077
+memory usage of 50: 1.293810
+memory usage of 1: 0.013847
+memory usage of 10376: 0.000000
+memory usage of 9578: 0.000000
+memory usage of 8790: 0.000000
+memory usage of 8779: 0.000000
+memory usage of 8771: 0.000000
+memory usage of 8469: 0.000000
+memory usage of 8468: 0.000000
+memory usage of 8467: 0.000000
+memory usage of 93: 0.000000
+memory usage of 50: 0.000000
+memory usage of 1: 0.000000
+memory usage of 10376: 0.027079
+memory usage of 9578: 0.077905
+memory usage of 8790: 1.629431
+memory usage of 8779: 1.348687
+memory usage of 8771: 0.424192
+memory usage of 8469: 0.077802
+memory usage of 8468: 0.001333
+memory usage of 8467: 0.001128
+memory usage of 93: 0.872797
+memory usage of 50: 1.293810
+memory usage of 1: 0.013847
+memory usage of 10376: 0.027079
+memory usage of 9578: 0.077905
+memory usage of 8790: 1.629431
+memory usage of 8779: 1.348687
+memory usage of 8771: 0.424192
+memory usage of 8469: 0.077802
+memory usage of 8468: 0.001333
+memory usage of 8467: 0.001128
+memory usage of 93: 0.872797
+memory usage of 50: 1.293810
+memory usage of 1: 0.013847
+memory usage of 10376: 0.027079
+memory usage of 9578: 0.077905
+memory usage of 8790: 1.629431
+memory usage of 8779: 1.348687
+memory usage of 8771: 0.424192
+memory usage of 8469: 0.077802
+memory usage of 8468: 0.001333
+memory usage of 8467: 0.001128
+memory usage of 93: 0.872797
+memory usage of 50: 1.293810
+memory usage of 1: 0.013847
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+memory usage of 10376: 0.027079
+memory usage of 9578: 0.077905
+memory usage of 8790: 1.629431
+memory usage of 8779: 1.348687
+memory usage of 8771: 0.424192
+memory usage of 8469: 0.077802
+memory usage of 8468: 0.001333
+memory usage of 8467: 0.001128
+memory usage of 93: 0.872797
+memory usage of 50: 1.293810
+memory usage of 1: 0.013847
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+keyinput_handler: KEY_DOWN - scroll down
+kh: sem_post(&sem_keyinput) (next instruction);
+keyinput_handler: KEY_DOWN - scroll down
+kh: sem_post(&sem_keyinput) (next instruction);
+keyinput_handler: KEY_DOWN - scroll down
+kh: sem_post(&sem_keyinput) (next instruction);
+keyinput_handler: KEY_DOWN - scroll down
+kh: sem_post(&sem_keyinput) (next instruction);
+keyinput_handler: KEY_DOWN - scroll down
+kh: sem_post(&sem_keyinput) (next instruction);
+keyinput_handler: KEY_DOWN - scroll down
+kh: sem_post(&sem_keyinput) (next instruction);
+keyinput_handler: KEY_DOWN - scroll down
+kh: sem_post(&sem_keyinput) (next instruction);
+keyinput_handler: KEY_DOWN - scroll down
+kh: sem_post(&sem_keyinput) (next instruction);
+keyinput_handler: KEY_DOWN - scroll down
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+keyinput_handler: KEY_UP - scroll up
+kh: sem_post(&sem_keyinput) (next instruction);
+keyinput_handler: KEY_UP - scroll up
+kh: sem_post(&sem_keyinput) (next instruction);
+keyinput_handler: KEY_UP - scroll up
+kh: sem_post(&sem_keyinput) (next instruction);
+keyinput_handler: KEY_UP - scroll up
+kh: sem_post(&sem_keyinput) (next instruction);
+keyinput_handler: KEY_UP - scroll up
+kh: sem_post(&sem_keyinput) (next instruction);
+keyinput_handler: KEY_UP - scroll up
+kh: sem_post(&sem_keyinput) (next instruction);
+keyinput_handler: KEY_UP - scroll up
+kh: sem_post(&sem_keyinput) (next instruction);
+keyinput_handler: KEY_UP - scroll up
+kh: sem_post(&sem_keyinput) (next instruction);
+keyinput_handler: KEY_UP - scroll up
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+memory usage of 10376: 0.027079
+memory usage of 9578: 0.077905
+memory usage of 8790: 1.629431
+memory usage of 8779: 1.348687
+memory usage of 8771: 0.424192
+memory usage of 8469: 0.077802
+memory usage of 8468: 0.001333
+memory usage of 8467: 0.001128
+memory usage of 93: 0.872797
+memory usage of 50: 1.293810
+memory usage of 1: 0.013847
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);
+memory usage of 10376: 0.027079
+memory usage of 9578: 0.077905
+memory usage of 8790: 1.629431
+memory usage of 8779: 1.348687
+memory usage of 8771: 0.424192
+memory usage of 8469: 0.077802
+memory usage of 8468: 0.001333
+memory usage of 8467: 0.001128
+memory usage of 93: 0.872797
+memory usage of 50: 1.293810
+memory usage of 1: 0.013847
+memory usage of 10376: 0.027079
+memory usage of 9578: 0.077905
+memory usage of 8790: 1.629431
+memory usage of 8779: 1.348687
+memory usage of 8771: 0.424192
+memory usage of 8469: 0.077802
+memory usage of 8468: 0.001333
+memory usage of 8467: 0.001128
+memory usage of 93: 0.872797
+memory usage of 50: 1.293810
+memory usage of 1: 0.013847
+memory usage of 10376: 0.027079
+memory usage of 9578: 0.077905
+memory usage of 8790: 1.629431
+memory usage of 8779: 1.348687
+memory usage of 8771: 0.424192
+memory usage of 8469: 0.077802
+memory usage of 8468: 0.001333
+memory usage of 8467: 0.001128
+memory usage of 93: 0.872797
+memory usage of 50: 1.293810
+memory usage of 1: 0.013847
+memory usage of 10376: 0.027079
+memory usage of 9578: 0.077905
+memory usage of 8790: 1.629431
+memory usage of 8779: 1.348687
+memory usage of 8771: 0.424192
+memory usage of 8469: 0.077802
+memory usage of 8468: 0.001333
+memory usage of 8467: 0.001128
+memory usage of 93: 0.872797
+memory usage of 50: 1.293810
+memory usage of 1: 0.013847
+memory usage of 10376: 0.027079
+memory usage of 9578: 0.077905
+memory usage of 8790: 1.629431
+memory usage of 8779: 1.348687
+memory usage of 8771: 0.424192
+memory usage of 8469: 0.077802
+memory usage of 8468: 0.001333
+memory usage of 8467: 0.001128
+memory usage of 93: 0.872797
+memory usage of 50: 1.293810
+memory usage of 1: 0.013847
+memory usage of 10376: 0.027079
+memory usage of 9578: 0.077905
+memory usage of 8790: 1.629431
+memory usage of 8779: 1.348687
+memory usage of 8771: 0.424192
+memory usage of 8469: 0.077802
+memory usage of 8468: 0.001333
+memory usage of 8467: 0.001128
+memory usage of 93: 0.872797
+memory usage of 50: 1.293810
+memory usage of 1: 0.013847
+kh: sem_post(&sem_keyinput) (next instruction);
+kh: sem_post(&sem_keyinput) (next instruction);

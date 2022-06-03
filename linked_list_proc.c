@@ -9,6 +9,7 @@
 #include <ctype.h>
 #include <pwd.h>
 #include <unistd.h>
+#include "utils.h"
 
 void ListItem_construct(ListItem* item, ListItemOps* ops) {
     item->prev=item->next=0;
@@ -126,7 +127,8 @@ int checkIfPidExists(ListHead* head, int pid) {
     return 0;
 }
 
-void readProcs(ListHead* head, WINDOW* w_body){
+void readProcs(ListHead* head, WINDOW* w_body, int total_ram){
+	int memProc;
 	float uptime = 0;
 	char *path_proc[] = { "/proc", NULL };
     FTS* fts_proc = fts_open(path_proc, FTS_PHYSICAL | FTS_NOSTAT, NULL);
@@ -149,17 +151,6 @@ void readProcs(ListHead* head, WINDOW* w_body){
 			}
 			if (!check) {
 				int pid = atoi(node->fts_name);
-				int uid = 0;
-				char pathUid[100];
-				snprintf(pathUid, 100, "/proc/%d/status", pid);
-				FILE* uidFile = fopen(pathUid, "r");
-				if (uidFile) {
-					fscanf(uidFile, "%d", &uid);
-					fclose(uidFile);
-				}
-				else {
-					continue;
-				}
 				if (i==1) {i=0; continue;}
 				if (i==0) i=1;
 				int exists = checkIfPidExists(head, pid);
@@ -169,12 +160,15 @@ void readProcs(ListHead* head, WINDOW* w_body){
                     aux->prev = aux->next = 0;
 					item->process = (PROCESS*)malloc(sizeof(PROCESS));
 					item->process->pid = pid;
+					char* name = getName(item->process);
+					item->process->name = name;
 					calculateProcessTime(item->process);
-					item->process->uid = uid;
 					unsigned int heartz = sysconf(_SC_CLK_TCK);
 					unsigned int seconds = uptime  - item->process->start_time;
 					float tot_proc = ((float)item->process->utime + (float)item->process->stime) / heartz;
 					float cpu_usage = 100 * (tot_proc / seconds);
+					memProc = calculateRAMProcess(item->process);
+                    item->process->mem_usage = 100 * ((float)memProc / 1000) / (float)total_ram;
 					item->process->cpu_usage = cpu_usage;
 					item->process->mem_usage = 0;
 					item->process->still_running = 1;
@@ -187,6 +181,8 @@ void readProcs(ListHead* head, WINDOW* w_body){
 					unsigned int seconds = uptime - item->process->start_time;
 					float tot_proc = ((float)item->process->utime + (float)item->process->stime) / heartz;
 					float cpu_usage = 100 * (tot_proc / seconds);
+					memProc = calculateRAMProcess(item->process);
+					item->process->mem_usage = 100 * ((float)memProc / 1000) / (float)total_ram;
 					item->process->cpu_usage = cpu_usage;
 					item->process->still_running = 1;
 				}
@@ -277,4 +273,73 @@ int getNumberOfProcesses(ListHead* head) {
 		item = item->next;
 	}
 	return count;
+}
+
+int calculateTotalRAM() {
+    FILE *fp;
+	char line[256];
+	char memory[256];
+	fp = fopen("/proc/meminfo", "r");
+	if (fp == NULL) {
+		perror("Error opening file");
+		exit(EXIT_FAILURE);
+	}
+	fgets(line, sizeof(line), fp);
+	int i;
+	int j = 0;
+    for (i = 0; i < strlen(line); i++) {
+		if (isdigit(line[i])) {
+			memory[j] = line[i];
+			j++;
+		}
+	}
+	int memory_int = atoi(memory);
+	fclose(fp);
+	return memory_int;
+}
+
+int calculateRAMProcess(PROCESS* item) {
+	int pid = item->pid;
+	char path[100];
+	snprintf(path, 100, "/proc/%d/stat", pid);
+	FILE* fProcessStatus = fopen(path, "r");
+	if (fProcessStatus == NULL) {
+		perror("fopen");
+		exit(1);
+	}
+	char line[1024];
+	fgets(line, sizeof(line), fProcessStatus);
+	fclose(fProcessStatus);
+	int i = 0;
+	char* token = strtok(line, " ");
+	while (i < 23) {
+		token = strtok(NULL, " ");
+		i++;
+	}
+	char* rssstr = token;
+	int rss = atoi(rssstr);
+	int pagesize = getpagesize();
+	int mem_int = rss * pagesize;
+	return mem_int;
+}
+
+char* getName(PROCESS* item) {
+	int pid = item->pid;
+	char path[100];
+	snprintf(path, 100, "/proc/%d/stat", pid);
+	FILE* fProcessStatus = fopen(path, "r");
+	if (fProcessStatus == NULL) {
+		perror("fopen");
+		exit(1);
+	}
+	char line[1024];
+	fgets(line, sizeof(line), fProcessStatus);
+	fclose(fProcessStatus);
+	int i = 0;
+	char* token = strtok(line, " ");
+	while (i < 1) {
+		token = strtok(NULL, " ");
+		i++;
+	}
+	return token;
 }

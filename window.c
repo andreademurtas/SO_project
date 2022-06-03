@@ -1,10 +1,12 @@
 #include "window.h"
+#include "utils.h"
+#include <stdlib.h>
 
 int quit_flag = 0; 
 sem_t sem_keyinput;
 sem_t sem_readprocs;
 
-void keyinput_handler (WINDOW *p_win, int ch, int nprocs, int* lower_bound, int* upper_bound) {
+void keyinput_handler (WINDOW *p_win, int ch, int nprocs, int* lower_bound, int* upper_bound, int* scrollHappened){
 	int x, y;
 	sem_wait(&sem_keyinput);
     getyx(p_win, y, x);
@@ -19,23 +21,23 @@ void keyinput_handler (WINDOW *p_win, int ch, int nprocs, int* lower_bound, int*
 				}
 				else {
 					//wscrl(p_win, -1);
-					if (*lower_bound > 0) (*lower_bound)--;
+					if (*lower_bound > 0) {(*lower_bound)--; (*scrollHappened) = 1; sem_wait(&sem_log);logToFile("keyinput_handler: KEY_UP - scroll up");sem_post(&sem_log);}
 					wmove(p_win, y, x);
 				}
 			}
 			wrefresh(p_win);
 			break;
 		case KEY_DOWN:
-			if (y < nprocs - 1) {
+			//if (y < nprocs - 1) {
 				if (checkbounds(x,y+1)) {
 					wmove(p_win, y+1, x);
 				}
 				else {
 					//wscrl(p_win, 1);
-					if (*lower_bound < nprocs-1) (*lower_bound)++;
+					if (*lower_bound < nprocs-1){ (*lower_bound)++; (*scrollHappened) = 1; sem_wait(&sem_log); logToFile("keyinput_handler: KEY_DOWN - scroll down");sem_post(&sem_log);}
 					wmove(p_win, y, x);
 				}
-			}
+			//}
 			wrefresh(p_win);
 			break;
 		default:

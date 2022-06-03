@@ -1,10 +1,13 @@
 #include <signal.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "window.h"
 #include "linked_list_proc.h"
 #include <pthread.h>
 #include <unistd.h>
 #include <semaphore.h>
+#include "utils.h"
 
 static char* banner = "  _     _                     _                  \n | |   | |                   | |                 \n | |__ | |_ ___  _ __     ___| | ___  _ __   ___ \n | \'_ \\| __/ _ \\| \'_ \\   / __| |/ _ \\| \'_ \\ / _ \\\n | | | | || (_) | |_) | | (__| | (_) | | | |  __/\n |_| |_|\\__\\___/| .__/   \\___|_|\\___/|_| |_|\\___|\n                | |                              \n                |_|                              ";
 
@@ -17,6 +20,7 @@ typedef struct {
 	ListHead* list_head;
 	int lower_bound;
 	int upper_bound;
+	int scrollHappened;
 } PROCESSthread_arg_t;
 
 void *thread_keyinput_func (void *arg) {
@@ -28,17 +32,27 @@ void *thread_keyinput_func (void *arg) {
 		sem_post(&sem_readprocs);
 		WINDOW* w_body = args->w_body;
 		int ch = wgetch(w_body);
-		keyinput_handler(w_body, ch, nprocs, &(args->lower_bound), &(args->upper_bound));
+		keyinput_handler(w_body, ch, nprocs, &(args->lower_bound), &(args->upper_bound), &(args->scrollHappened));
 	}
 	return NULL;
 }
 
-
+void padString(char* str) {
+	int len = strlen(str);
+	if (len < 5) {
+		int i;
+		for (i = 0; i < 5 - len; i++) {
+			strcat(str, " ");
+		}
+	}
+}
 
 void *thread_processes_func(void *arg) {
 	PROCESSthread_arg_t* arg_t = (PROCESSthread_arg_t*)arg;
 	int* lower_bound = &(arg_t->lower_bound);
 	int* upper_bound = &(arg_t->upper_bound);
+	int* scrollHappened = &(arg_t->scrollHappened);
+	int total_ram = calculateTotalRAM();
 	ListHead* list_head = arg_t->list_head;
 	WINDOW* w_body = arg_t->w_body;
 	int x, y;
@@ -46,17 +60,31 @@ void *thread_processes_func(void *arg) {
 		usleep(1000000);
 		sem_wait(&sem_keyinput);
 		getyx(w_body, y, x);
-		sem_wait(&sem_readprocs);
-		readProcs(list_head, w_body);
-		sem_post(&sem_readprocs);
+		readProcs(list_head, w_body, total_ram);
 		werase(w_body);
 		ListItemProcess* item = (ListItemProcess*)list_head->first;
-		int i = 0;
+		int i = *lower_bound;
 		while (item != NULL) {
-			if (i >= *lower_bound && i <= *upper_bound) wprintw(w_body, "  PID: %d    UID: %d    CPU USAGE: %f\n", item->process->pid, item->process->uid, item->process->cpu_usage);
-            ListItem* aux = (ListItem*)item;
-			item = (ListItemProcess*)aux->next;
-			i++;
+			char pid[6];
+			sprintf(pid, "%d", item->process->pid);
+			padString(pid);
+			if (i >= *lower_bound && i <= *upper_bound && !(*scrollHappened)) {
+				wprintw(w_body, "  PID: %s    NAME: %s    CPU USAGE: %%%.2f    MEM USAGE: %%%.2f\n", pid,item->process->name, item->process->cpu_usage, item->process->mem_usage);
+            	ListItem* aux = (ListItem*)item;
+				item = (ListItemProcess*)aux->next;
+				i++;
+			} else if (*scrollHappened){
+                werase(w_body);
+				wrefresh(w_body);
+				item = (ListItemProcess*)list_head->first;
+				*scrollHappened = 0;
+				i = *lower_bound;
+			}
+			else {
+				ListItem* aux = (ListItem*)item;
+				item = (ListItemProcess*)aux->next;
+				i++;
+			}
 		}
 		wmove(w_body, y, x);
 		wrefresh(w_body);
@@ -121,6 +149,7 @@ int main() {
 	pthread_t thread_processes;
 	sem_init(&sem_keyinput, 0, 1);
 	sem_init(&sem_readprocs, 0, 1);
+	sem_init(&sem_log, 0, 1);
 	PROCESSthread_arg_t arg_proc = {w_body, &listProcesses, lower_bound, upper_bound};
 	PROCESSthread_arg_t arg_keyinput = {w_body, &listProcesses, lower_bound, upper_bound};
 	pthread_create(&thread_keyinput, NULL, thread_keyinput_func, &arg_keyinput);
@@ -129,6 +158,7 @@ int main() {
 	pthread_join(thread_processes, NULL);
 	sem_destroy(&sem_keyinput);
 	sem_destroy(&sem_readprocs);
+	sem_destroy(&sem_log);
 	delwin(w_header);
 	delwin(w_body);
 	delwin(w_footer);
