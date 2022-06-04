@@ -37,11 +37,11 @@ void *thread_keyinput_func (void *arg) {
 	return NULL;
 }
 
-void padString(char* str) {
+void padString(char* str, int len_to_pad) {
 	int len = strlen(str);
-	if (len < 5) {
+	if (len < len_to_pad) {
 		int i;
-		for (i = 0; i < 5 - len; i++) {
+		for (i = 0; i < len_to_pad - len; i++) {
 			strcat(str, " ");
 		}
 	}
@@ -67,9 +67,10 @@ void *thread_processes_func(void *arg) {
 		while (item != NULL) {
 			char pid[6];
 			sprintf(pid, "%d", item->process->pid);
-			padString(pid);
+			padString(pid, 5);
+			padString(item->process->name, 20);
 			if (i >= *lower_bound && i <= *upper_bound && !(*scrollHappened)) {
-				wprintw(w_body, "  PID: %s    NAME: %s    CPU USAGE: %%%.2f    MEM USAGE: %%%.2f\n", pid,item->process->name, item->process->cpu_usage, item->process->mem_usage);
+				wprintw(w_body, "  PID: %s    NAME: %s    CPU USAGE: %%%.2f    MEM USAGE: %%%.2f\n", pid, item->process->name, item->process->cpu_usage, item->process->mem_usage);
             	ListItem* aux = (ListItem*)item;
 				item = (ListItemProcess*)aux->next;
 				i++;
@@ -114,15 +115,22 @@ int main() {
 	WINDOW* w_footer = newwin(1, COLS-2, LINES-2, 1);
 	if (can_change_color() == TRUE)
 	{
-		init_color(COLOR_BLACK, 400, 400, 400);
-		init_pair(1, COLOR_BLACK, COLOR_BLACK);
-		//wattron(w_header_wrapper, COLOR_PAIR(1));
-		//wattron(w_body_wrapper, COLOR_PAIR(1));
-		//wattron(w_footer_wrapper, COLOR_PAIR(1));
-		//wattron(w_header, COLOR_PAIR(1));
-		//wattron(w_body, COLOR_PAIR(1));
-		//wattron(w_footer, COLOR_PAIR(1));
+		use_default_colors();
+		init_pair(0xFF, COLOR_BLACK, COLOR_WHITE);
+		wbkgd(w_header_wrapper, COLOR_PAIR(0xFF));
+		wbkgd(w_header, COLOR_PAIR(0xFF));
+		wbkgd(w_body_wrapper, COLOR_PAIR(0xFF));
+		wbkgd(w_body, COLOR_PAIR(0xFF));
+		wbkgd(w_footer_wrapper, COLOR_PAIR(0xFF));
+		wbkgd(w_footer, COLOR_PAIR(0xFF));
 	}
+	wrefresh(w_header_wrapper);
+	wrefresh(w_header);
+	wrefresh(w_body_wrapper);
+	wrefresh(w_body);
+	wrefresh(w_footer_wrapper);
+	wrefresh(w_footer);
+
 	int lower_bound = 0;
 	int upper_bound = LINES-14;
 	keypad(w_body, TRUE);
@@ -166,6 +174,7 @@ int main() {
 	while (curr != NULL) {
 		ListItem* aux = curr;
 	    curr = curr->next;
+		free(((ListItemProcess*)aux)->process->name);
 		free(((ListItemProcess*)aux)->process);
 	    free(aux);
 	}

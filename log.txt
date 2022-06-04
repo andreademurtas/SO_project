@@ -482,3 +482,57 @@ memory usage of 50: 1.293810
 memory usage of 1: 0.013847
 kh: sem_post(&sem_keyinput) (next instruction);
 kh: sem_post(&sem_keyinput) (next instruction);
+keyinput_handler: KEY_DOWN - scroll down
+keyinput_handler: KEY_DOWN - scroll down
+keyinput_handler: KEY_DOWN - scroll down
+keyinput_handler: KEY_DOWN - scroll down
+keyinput_handler: KEY_DOWN - scroll down
+keyinput_handler: KEY_DOWN - scroll down
+keyinput_handler: KEY_DOWN - scroll down
+keyinput_handler: KEY_DOWN - scroll down
+keyinput_handler: KEY_DOWN - scroll down
+keyinput_handler: KEY_DOWN - scroll down
+keyinput_handler: KEY_DOWN - scroll down
+keyinput_handler: KEY_DOWN - scroll down
+keyinput_handler: KEY_DOWN - scroll down
+keyinput_handler: KEY_UP - scroll up
+keyinput_handler: KEY_UP - scroll up
+keyinput_handler: KEY_UP - scroll up
+keyinput_handler: KEY_UP - scroll up
+keyinput_handler: KEY_UP - scroll up
+keyinput_handler: KEY_UP - scroll up
+keyinput_handler: KEY_UP - scroll up
+keyinput_handler: KEY_UP - scroll up
+keyinput_handler: KEY_UP - scroll up
+keyinput_handler: KEY_UP - scroll up
+keyinput_handler: KEY_UP - scroll up
+keyinput_handler: KEY_UP - scroll up
+keyinput_handler: KEY_UP - scroll up
+75
+75
+75
+75
+75
+.75
+.75
+.75
+5.75
+5.75
+5.75
+5.75
+5.75
+05.75
+keyinput_handler: KEY_DOWN - scroll down
+keyinput_handler: KEY_DOWN - scroll down
+keyinput_handler: KEY_DOWN - scroll down
+keyinput_handler: KEY_DOWN - scroll down
+keyinput_handler: KEY_DOWN - scroll down
+keyinput_handler: KEY_DOWN - scroll down
+keyinput_handler: KEY_DOWN - scroll down
+keyinput_handler: KEY_UP - scroll up
+keyinput_handler: KEY_UP - scroll up
+keyinput_handler: KEY_UP - scroll up
+keyinput_handler: KEY_UP - scroll up
+keyinput_handler: KEY_UP - scroll up
+keyinput_handler: KEY_UP - scroll up
+keyinput_handler: KEY_UP - scroll up

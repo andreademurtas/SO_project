@@ -341,5 +341,7 @@ char* getName(PROCESS* item) {
 		token = strtok(NULL, " ");
 		i++;
 	}
-	return token;
+	char *name = (char*)malloc(sizeof(char) * strlen(token));
+	strcpy(name, token);
+	return name;
 }
