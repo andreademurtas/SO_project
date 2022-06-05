@@ -18,9 +18,7 @@ void sigint_handler (int sig) {
 typedef struct {
 	WINDOW* w_body;
 	ListHead* list_head;
-	int lower_bound;
-	int upper_bound;
-	int scrollHappened;
+	int lower_limit;
 } PROCESSthread_arg_t;
 
 void *thread_keyinput_func (void *arg) {
@@ -32,7 +30,7 @@ void *thread_keyinput_func (void *arg) {
 		sem_post(&sem_readprocs);
 		WINDOW* w_body = args->w_body;
 		int ch = wgetch(w_body);
-		keyinput_handler(w_body, ch, nprocs, &(args->lower_bound), &(args->upper_bound), &(args->scrollHappened));
+		keyinput_handler(w_body, ch, nprocs, &(args->lower_limit));
 	}
 	return NULL;
 }
@@ -49,9 +47,7 @@ void padString(char* str, int len_to_pad) {
 
 void *thread_processes_func(void *arg) {
 	PROCESSthread_arg_t* arg_t = (PROCESSthread_arg_t*)arg;
-	int* lower_bound = &(arg_t->lower_bound);
-	int* upper_bound = &(arg_t->upper_bound);
-	int* scrollHappened = &(arg_t->scrollHappened);
+	int* lower_limit = &(arg_t->lower_limit);
 	int total_ram = calculateTotalRAM();
 	ListHead* list_head = arg_t->list_head;
 	WINDOW* w_body = arg_t->w_body;
@@ -63,23 +59,30 @@ void *thread_processes_func(void *arg) {
 		readProcs(list_head, w_body, total_ram);
 		werase(w_body);
 		ListItemProcess* item = (ListItemProcess*)list_head->first;
-		int i = *lower_bound;
+		int i = 0;
+		int old_lower_limit = *lower_limit;
 		while (item != NULL) {
 			char pid[6];
 			sprintf(pid, "%d", item->process->pid);
 			padString(pid, 5);
+			sem_wait(&sem_log);
+			char* log = (char*)malloc(sizeof(char)* 100);
+			sprintf(log, "lower_limit: %d", *lower_limit);
+			logToFile(log);
+			free(log);
+			sem_post(&sem_log);
 			padString(item->process->name, 20);
-			if (i >= *lower_bound && i <= *upper_bound && !(*scrollHappened)) {
+			if (i >= (*lower_limit) * (LINES - 14) && i <= (*lower_limit) * (LINES - 14) + (LINES - 14)) {
 				wprintw(w_body, "  PID: %s    NAME: %s    CPU USAGE: %%%.2f    MEM USAGE: %%%.2f\n", pid, item->process->name, item->process->cpu_usage, item->process->mem_usage);
             	ListItem* aux = (ListItem*)item;
 				item = (ListItemProcess*)aux->next;
 				i++;
-			} else if (*scrollHappened){
+			} else if (old_lower_limit != *lower_limit) {
+				old_lower_limit = *lower_limit;
                 werase(w_body);
 				wrefresh(w_body);
 				item = (ListItemProcess*)list_head->first;
-				*scrollHappened = 0;
-				i = *lower_bound;
+				i = 0;
 			}
 			else {
 				ListItem* aux = (ListItem*)item;
@@ -100,8 +103,8 @@ int main() {
 	initscr();
 	if(has_colors() == FALSE)
 	{	
-		endwin();
 		printf("Your terminal does not support colors. Boring...\nQuitting.\n");
+		endwin();
 		exit(1);
 	}
 	start_color();
@@ -109,8 +112,8 @@ int main() {
 	noecho();
 	WINDOW* w_header_wrapper = newwin(9, COLS, 0, 0);
 	WINDOW* w_header = newwin(7, COLS-3, 1, 2);
-	WINDOW* w_body_wrapper = newwin(LINES-12, COLS, 9, 0);
-	WINDOW* w_body = newwin(LINES-14, COLS-2, 10, 1);
+	WINDOW* w_body_wrapper = newwin(LINES-11, COLS, 9, 0);
+	WINDOW* w_body = newwin(LINES-13, COLS-2, 10, 1);
 	WINDOW* w_footer_wrapper = newwin(3, COLS, LINES-3, 0);
 	WINDOW* w_footer = newwin(1, COLS-2, LINES-2, 1);
 	if (can_change_color() == TRUE)
@@ -130,9 +133,7 @@ int main() {
 	wrefresh(w_body);
 	wrefresh(w_footer_wrapper);
 	wrefresh(w_footer);
-
-	int lower_bound = 0;
-	int upper_bound = LINES-14;
+	lower_limit = 0;
 	keypad(w_body, TRUE);
 	scrollok(w_body, TRUE);
 	idlok(w_body, TRUE);
@@ -158,8 +159,8 @@ int main() {
 	sem_init(&sem_keyinput, 0, 1);
 	sem_init(&sem_readprocs, 0, 1);
 	sem_init(&sem_log, 0, 1);
-	PROCESSthread_arg_t arg_proc = {w_body, &listProcesses, lower_bound, upper_bound};
-	PROCESSthread_arg_t arg_keyinput = {w_body, &listProcesses, lower_bound, upper_bound};
+	PROCESSthread_arg_t arg_proc = {w_body, &listProcesses, lower_limit};
+	PROCESSthread_arg_t arg_keyinput = {w_body, &listProcesses, lower_limit};
 	pthread_create(&thread_keyinput, NULL, thread_keyinput_func, &arg_keyinput);
 	pthread_create(&thread_processes, NULL, thread_processes_func, &arg_proc);
 	pthread_join(thread_keyinput, NULL);
@@ -170,6 +171,9 @@ int main() {
 	delwin(w_header);
 	delwin(w_body);
 	delwin(w_footer);
+	delwin(w_header_wrapper);
+	delwin(w_body_wrapper);
+	delwin(w_footer_wrapper);
 	ListItem* curr = (&listProcesses)->first;
 	while (curr != NULL) {
 		ListItem* aux = curr;

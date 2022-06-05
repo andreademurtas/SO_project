@@ -1,15 +1,7 @@
 #include "linked_list_proc.h"
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fts.h>
-#include <ctype.h>
-#include <pwd.h>
-#include <unistd.h>
-#include "utils.h"
+
+int procIndex = -1;
+int lower_limit = 0;
 
 void ListItem_construct(ListItem* item, ListItemOps* ops) {
     item->prev=item->next=0;
@@ -202,6 +194,7 @@ void readProcs(ListHead* head, WINDOW* w_body, int total_ram){
 		ListItemProcess* next = (ListItemProcess*)(((ListItem*)item)->next);
 		if (!item->process->still_running) {
 			List_detach(head, (ListItem*)item);
+			free(item->process->name);
 			free(item->process);
 			free(item);
 		}

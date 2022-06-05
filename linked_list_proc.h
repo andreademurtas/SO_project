@@ -1,5 +1,20 @@
 #pragma once
 #include <ncurses.h>
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fts.h>
+#include <ctype.h>
+#include <pwd.h>
+#include <unistd.h>
+#include "utils.h"
+
+
+extern int procIndex;
+extern int lower_limit;
 
 struct ListItem;
 
