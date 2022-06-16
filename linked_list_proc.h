@@ -14,7 +14,7 @@
 
 
 extern int procIndex;
-extern int lower_limit;
+extern int* lower_limit;
 
 struct ListItem;
 
@@ -66,7 +66,7 @@ typedef struct {
 } ListItemProcess;
 
 int checkIfPidExists(ListHead* head, int pid);
-void readProcs(ListHead* head,WINDOW* w_body, int total_ram);
+void readProcs(ListHead* head, int total_ram);
 void calculateTotalCPUTime(float* uptime);
 void calculateProcessTime(PROCESS* item);
 ListItemProcess* findByPid(ListHead* head, int pid);

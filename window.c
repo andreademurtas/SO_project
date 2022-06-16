@@ -18,9 +18,7 @@ void keyinput_handler (WINDOW *p_win, int ch, int nprocs, int* lower_limit){
 					wmove(p_win, y-1, x);
 				}
 				else {
-					//wscrl(p_win, -1);
-					if (*lower_limit > 0) {(*lower_limit)--; sem_wait(&sem_log);logToFile("keyinput_handler: KEY_UP - scroll up");sem_post(&sem_log); wmove(p_win, LINES-14,x);}
-					else {wmove(p_win, y, x);}
+					wmove(p_win, y, x);
 				}
 			}
 			wrefresh(p_win);
@@ -31,13 +29,32 @@ void keyinput_handler (WINDOW *p_win, int ch, int nprocs, int* lower_limit){
 					wmove(p_win, y+1, x);
 				}
 				else {
-					//wscrl(p_win, 1);
-					if (*lower_limit <= (nprocs - 1) / LINES-14){ (*lower_limit)++; sem_wait(&sem_log); logToFile("keyinput_handler: KEY_DOWN - scroll down");sem_post(&sem_log);wmove(p_win, 0, x);}
-					else {wmove(p_win, y, x);}
+					wmove(p_win, y, x);
 				}
 			}
 			wrefresh(p_win);
 			break;
+		case KEY_LEFT:
+			if (*lower_limit > 0) {
+				*lower_limit -= 1;
+				wclear(p_win);
+				wprintw(p_win, "  Loading...");
+				wmove(p_win, 0, 2);
+			}
+			break;
+		case KEY_RIGHT:
+			if (*lower_limit < (nprocs + LINES - 13) / LINES - 14) {
+				*lower_limit += 1;
+				wclear(p_win);
+				wprintw(p_win, "  Loading...");
+				wmove(p_win, 0, 2);
+				sem_wait(&sem_log);
+				char* log =(char*)malloc(sizeof(char)*100);
+				sprintf(log, "Lower limit: %d", *lower_limit);
+				logToFile(log);
+				free(log);
+				sem_post(&sem_log);
+			}
 		default:
 			break;
 	}

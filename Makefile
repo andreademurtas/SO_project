@@ -7,6 +7,7 @@ DEPS:=utils.h window.h linked_list_proc.h
 
 main: main.o utils.o window.o linked_list_proc.o
 	$(CC) -o $@ $^ $(CFLAGS)
+	rm -f *.o
 
 clean:
 	rm -f *.o

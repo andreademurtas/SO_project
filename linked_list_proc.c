@@ -1,7 +1,7 @@
 #include "linked_list_proc.h"
 
 int procIndex = -1;
-int lower_limit = 0;
+int* lower_limit;
 
 void ListItem_construct(ListItem* item, ListItemOps* ops) {
     item->prev=item->next=0;
@@ -119,7 +119,7 @@ int checkIfPidExists(ListHead* head, int pid) {
     return 0;
 }
 
-void readProcs(ListHead* head, WINDOW* w_body, int total_ram){
+void readProcs(ListHead* head, int total_ram){
 	int memProc;
 	float uptime = 0;
 	char *path_proc[] = { "/proc", NULL };

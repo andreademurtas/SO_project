@@ -8,17 +8,23 @@
 #include <unistd.h>
 #include <semaphore.h>
 #include "utils.h"
+#include <stdint.h>
+#include <errno.h>
 
-static char* banner = "  _     _                     _                  \n | |   | |                   | |                 \n | |__ | |_ ___  _ __     ___| | ___  _ __   ___ \n | \'_ \\| __/ _ \\| \'_ \\   / __| |/ _ \\| \'_ \\ / _ \\\n | | | | || (_) | |_) | | (__| | (_) | | | |  __/\n |_| |_|\\__\\___/| .__/   \\___|_|\\___/|_| |_|\\___|\n                | |                              \n                |_|                              ";
+static char* banner = "  _____                  _    _      _                 \n |  __ \\                | |  | |    | |                \n | |__) | __ ___   ___  | |__| | ___| |_ __   ___ _ __ \n |  ___/ \'__/ _ \\ / __| |  __  |/ _ \\ | \'_ \\ / _ \\ \'__|\n | |   | | | (_) | (__  | |  | |  __/ | |_) |  __/ |   \n |_|   |_|  \\___/ \\___| |_|  |_|\\___|_| .__/ \\___|_|   \n                                      | |              \n                                      |_|";
+
+static char* infos = "Version 1.0\n\nThis is a simple shell for interacting with process and displaying useful informations about them.\nType 'help' for a list of all the commands.\n";
+
+static char* help = "\nhelp                Display this help\nquit                Exit the shell\nclear               Clear the screen\nps                  Display the list of processes\nkill [pid]          Kill a process\nterminate [pid]     Terminate a process \n";
+
 
 void sigint_handler (int sig) {
-	quit_flag = 1;
 }
-
+/*
 typedef struct {
 	WINDOW* w_body;
 	ListHead* list_head;
-	int lower_limit;
+	int* lower_limit;
 } PROCESSthread_arg_t;
 
 void *thread_keyinput_func (void *arg) {
@@ -30,10 +36,11 @@ void *thread_keyinput_func (void *arg) {
 		sem_post(&sem_readprocs);
 		WINDOW* w_body = args->w_body;
 		int ch = wgetch(w_body);
-		keyinput_handler(w_body, ch, nprocs, &(args->lower_limit));
+		keyinput_handler(w_body, ch, nprocs, args->lower_limit);
 	}
 	return NULL;
 }
+*/
 
 void padString(char* str, int len_to_pad) {
 	int len = strlen(str);
@@ -45,15 +52,16 @@ void padString(char* str, int len_to_pad) {
 	}
 }
 
+/*
 void *thread_processes_func(void *arg) {
 	PROCESSthread_arg_t* arg_t = (PROCESSthread_arg_t*)arg;
-	int* lower_limit = &(arg_t->lower_limit);
+	int* lower_limit = arg_t->lower_limit;
 	int total_ram = calculateTotalRAM();
 	ListHead* list_head = arg_t->list_head;
 	WINDOW* w_body = arg_t->w_body;
 	int x, y;
+	usleep(1000000);
 	while (!quit_flag) {
-		usleep(1000000);
 		sem_wait(&sem_keyinput);
 		getyx(w_body, y, x);
 		readProcs(list_head, w_body, total_ram);
@@ -72,15 +80,13 @@ void *thread_processes_func(void *arg) {
 			free(log);
 			sem_post(&sem_log);
 			padString(item->process->name, 20);
-			if (i >= (*lower_limit) * (LINES - 14) && i <= (*lower_limit) * (LINES - 14) + (LINES - 14)) {
-				wprintw(w_body, "  PID: %s    NAME: %s    CPU USAGE: %%%.2f    MEM USAGE: %%%.2f\n", pid, item->process->name, item->process->cpu_usage, item->process->mem_usage);
+			if (i >= (*lower_limit) * (LINES - 13) && i <= (*lower_limit) * (LINES - 14) + (LINES - 14)) {
+				wprintw(w_body, "  PID: %s    NAME: %s    CPU USAGE: %%%.2f    MEM USAGE: %%%.2f    LINES: %d\n", pid, item->process->name, item->process->cpu_usage, item->process->mem_usage, LINES);
             	ListItem* aux = (ListItem*)item;
 				item = (ListItemProcess*)aux->next;
 				i++;
 			} else if (old_lower_limit != *lower_limit) {
 				old_lower_limit = *lower_limit;
-                werase(w_body);
-				wrefresh(w_body);
 				item = (ListItemProcess*)list_head->first;
 				i = 0;
 			}
@@ -93,13 +99,16 @@ void *thread_processes_func(void *arg) {
 		wmove(w_body, y, x);
 		wrefresh(w_body);
 		sem_post(&sem_keyinput);
-		usleep(4000000);
+		uint16_t counter = 1;
+		while (*lower_limit == old_lower_limit && counter != 0 && !quit_flag) {
+            counter += 1;
+			usleep(10);
+		}
 	}
 	return NULL;
 }
 
-int main() {
-	signal(SIGINT, sigint_handler);
+void initNcurses() {
 	initscr();
 	if(has_colors() == FALSE)
 	{	
@@ -108,12 +117,19 @@ int main() {
 		exit(1);
 	}
 	start_color();
-	raw();
+	cbreak();
 	noecho();
+}
+
+int main() {
+	signal(SIGINT, sigint_handler);
+	initNcurses();
+	FIELD* fields[5];
+	FORM* form;
 	WINDOW* w_header_wrapper = newwin(9, COLS, 0, 0);
 	WINDOW* w_header = newwin(7, COLS-3, 1, 2);
-	WINDOW* w_body_wrapper = newwin(LINES-11, COLS, 9, 0);
-	WINDOW* w_body = newwin(LINES-13, COLS-2, 10, 1);
+	WINDOW* w_body_wrapper = newwin(LINES-12, COLS, 9, 0);
+	WINDOW* w_body = newwin(LINES-14, COLS-2, 10, 1);
 	WINDOW* w_footer_wrapper = newwin(3, COLS, LINES-3, 0);
 	WINDOW* w_footer = newwin(1, COLS-2, LINES-2, 1);
 	if (can_change_color() == TRUE)
@@ -133,7 +149,8 @@ int main() {
 	wrefresh(w_body);
 	wrefresh(w_footer_wrapper);
 	wrefresh(w_footer);
-	lower_limit = 0;
+	lower_limit = (int*)malloc(sizeof(int));
+	*lower_limit = 0;
 	keypad(w_body, TRUE);
 	scrollok(w_body, TRUE);
 	idlok(w_body, TRUE);
@@ -142,8 +159,8 @@ int main() {
 	box(w_body_wrapper, 0, 0);
 	box(w_footer_wrapper, 0, 0);
 	wprintw(w_header, "%s", banner);
-	wprintw(w_body, "Loading...\n");
-	wprintw(w_footer, "(F1) - Terminate        (F2) - Kill        (F3) - Suspend       (F4) - Resume\n");
+	wprintw(w_body, "  Loading...\n");
+	wprintw(w_footer, "(F1) - Terminate    (F2) - Kill    (F3) - Suspend   (F4) - Resume    (->) - Go To Next Page    (<-) - Go To Previous Page    (q) - Quit\n");
 	wrefresh(w_header_wrapper);
 	wrefresh(w_header);
 	wrefresh(w_body_wrapper);
@@ -182,7 +199,135 @@ int main() {
 		free(((ListItemProcess*)aux)->process);
 	    free(aux);
 	}
+	free(lower_limit);
 	endwin();
 	return 0;
+}*/
+
+void ps(ListHead* head, int total_ram) {
+    readProcs(head, total_ram);
+	ListItemProcess* proc = (ListItemProcess*)(head->first);
+	uint8_t i = 0;
+	while (proc) {
+		char pid[6];
+		char number[9];
+		sprintf(number, "%d)", i);
+		sprintf(pid, "%d", proc->process->pid);
+		pid[5] = '\0';
+		number[8] = '\0';
+		padString(pid, 5);	
+		padString(number, 5);
+		padString(proc->process->name, 20);
+		printf("%s PID: %s    NAME: %s    CPU USAGE: %%%.2f    MEM USAGE: %%%.2f\n", number, pid, proc->process->name, proc->process->cpu_usage, proc->process->mem_usage);
+		ListItem* aux = (ListItem*)proc;
+		proc = (ListItemProcess*)aux->next;
+		i++;
+	}
 }
 
+void interactive() {
+
+}
+
+void arg_handler(char* argv[]){
+    exit(0);
+}
+
+int main(int argc, char* argv[]) {
+	if (argc > 1) {
+		arg_handler(argv);
+	}
+	int total_ram = calculateTotalRAM();
+	ListHead listProcesses;
+	List_init(&listProcesses);
+    printf("%s\n", banner);
+	printf("%s\n", infos);
+	char* command = (char*)malloc(sizeof(char)*100);
+	while (1) {
+        printf("prochelper> ");
+		memset(command, 0, 100);
+		char* ret = fgets(command, 100, stdin);
+		command[strlen(command)-1] = '\0';
+		char* token = strtok(command, " ");
+		if (strcmp(token, "quit") == 0 || strcmp(token, "q") == 0) {
+			break;
+		}
+		if (strcmp(token, "help") == 0) {
+			printf("%s\n", help);
+		}
+		if (strcmp(token, "clear") == 0) {
+			system("clear");
+		}
+		if (strcmp(token, "ps") == 0) {
+			ps(&listProcesses, total_ram);
+		}
+		if (strcmp(token, "interactive") == 0) {
+			interactive();
+		}
+		if (strcmp(token, "terminate") == 0) {
+            token = strtok(NULL, " ");
+			if (token == NULL) {
+                printf("You must specify a PID.\n");
+			}
+			else {
+			    int check = 0;
+				for (const char* c = token; *c != '\0'; c++) {
+					if (!isdigit(*c)) {
+						check = 1;
+						break;
+					}
+				}
+				if (check) {
+                    printf("Invalid PID.\n");
+				}
+				else {
+					int pid = atoi(token);
+					int ret = kill(pid, SIGTERM);
+					if (ret == 0) {
+						printf("Process %d terminated.\n", pid);
+					}
+					else {
+						printf("Process %d not found.\n", pid);
+					}
+				}
+			}
+		}
+		if (strcmp(token, "kill") == 0) {
+			token = strtok(NULL, " ");
+			if (token == NULL) {
+				printf("You must specify a PID.\n");
+			}
+			else {
+			    int check = 0;
+				for (const char* c = token; *c != '\0'; c++) {
+					if (!isdigit(*c)) {
+						check = 1;
+						break;
+					}
+				}
+				if (check) {
+					printf("Invalid PID.\n");
+				}
+				else {
+					int pid = atoi(token);
+					int ret = kill(pid, SIGKILL);
+					if (ret == 0) {
+						printf("Process %d killed.\n", pid);
+					}
+					else {
+						printf("Process %d not found.\n", pid);
+					}
+				}
+			}
+		}
+	}
+	ListItem* curr = (&listProcesses)->first;
+	while (curr != NULL) {
+		ListItem* aux = curr;
+	    curr = curr->next;
+		free(((ListItemProcess*)aux)->process->name);
+		free(((ListItemProcess*)aux)->process);
+	    free(aux);
+	}
+	free(command);
+}
