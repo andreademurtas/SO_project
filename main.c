@@ -11,15 +11,21 @@
 #include <stdint.h>
 #include <errno.h>
 
+#define ANSI_COLOR_RED     "\x1b[31m"
+#define ANSI_COLOR_GREEN   "\x1b[32m"
+#define ANSI_COLOR_YELLOW  "\x1b[33m"
+#define ANSI_COLOR_BLUE    "\x1b[34m"
+#define ANSI_COLOR_MAGENTA "\x1b[35m"
+#define ANSI_COLOR_CYAN    "\x1b[36m"
+#define ANSI_COLOR_RESET   "\x1b[0m"
+
+
 static char* banner = "  _____                  _    _      _                 \n |  __ \\                | |  | |    | |                \n | |__) | __ ___   ___  | |__| | ___| |_ __   ___ _ __ \n |  ___/ \'__/ _ \\ / __| |  __  |/ _ \\ | \'_ \\ / _ \\ \'__|\n | |   | | | (_) | (__  | |  | |  __/ | |_) |  __/ |   \n |_|   |_|  \\___/ \\___| |_|  |_|\\___|_| .__/ \\___|_|   \n                                      | |              \n                                      |_|";
 
 static char* infos = "Version 1.0\n\nThis is a simple shell for interacting with process and displaying useful informations about them.\nType 'help' for a list of all the commands.\n";
 
-static char* help = "\nhelp                Display this help\nquit                Exit the shell\nclear               Clear the screen\nps                  Display the list of processes\nkill [pid]          Kill a process\nterminate [pid]     Terminate a process \n";
+static char* help = "\nhelp                Display this help\nquit                Exit the shell\nclear               Clear the screen\nps                  Display the list of processes\nkill [pid]          Kill a process\nterminate [pid]     Terminate a process \nsuspend [pid]       Suspend a process\nresume [pid]        Resume a process\ninteractive         Enter interactive mode\n";
 
-
-void sigint_handler (int sig) {
-}
 /*
 typedef struct {
 	WINDOW* w_body;
@@ -107,7 +113,7 @@ void *thread_processes_func(void *arg) {
 	}
 	return NULL;
 }
-
+*/
 void initNcurses() {
 	initscr();
 	if(has_colors() == FALSE)
@@ -119,8 +125,17 @@ void initNcurses() {
 	start_color();
 	cbreak();
 	noecho();
+	keypad(stdscr, TRUE);
+	scrollok(stdscr, TRUE);
+	idlok(stdscr, TRUE);
+	if (can_change_color()==TRUE){
+		use_default_colors();
+		init_pair(1, COLOR_BLACK, COLOR_WHITE);
+		wbkgd(stdscr, COLOR_PAIR(1));
+	}
 }
 
+/*
 int main() {
 	signal(SIGINT, sigint_handler);
 	initNcurses();
@@ -218,15 +233,26 @@ void ps(ListHead* head, int total_ram) {
 		padString(pid, 5);	
 		padString(number, 5);
 		padString(proc->process->name, 20);
-		printf("%s PID: %s    NAME: %s    CPU USAGE: %%%.2f    MEM USAGE: %%%.2f\n", number, pid, proc->process->name, proc->process->cpu_usage, proc->process->mem_usage);
+		char susp_or_run[10];
+		if (proc->process->suspended) {
+			strcpy(susp_or_run, "Suspended");
+		} else {
+			strcpy(susp_or_run, "Running");
+		}
+		printf("%s PID: %s    NAME: %s    CPU USAGE: %%%.2f    MEM USAGE: %%%.2f    %s\n", number, pid, proc->process->name, proc->process->cpu_usage, proc->process->mem_usage, susp_or_run);
 		ListItem* aux = (ListItem*)proc;
 		proc = (ListItemProcess*)aux->next;
 		i++;
 	}
 }
 
-void interactive() {
-
+void interactive(int ncursesInitialized) {
+    if (!ncursesInitialized) {
+		initNcurses();
+	}
+	refresh();
+	usleep(1000000);
+	endwin();
 }
 
 void arg_handler(char* argv[]){
@@ -240,20 +266,24 @@ int main(int argc, char* argv[]) {
 	int total_ram = calculateTotalRAM();
 	ListHead listProcesses;
 	List_init(&listProcesses);
-    printf("%s\n", banner);
+    printf(ANSI_COLOR_YELLOW "%s" ANSI_COLOR_RESET "\n", banner);
 	printf("%s\n", infos);
 	char* command = (char*)malloc(sizeof(char)*100);
+	int ncursesInitialized = 0;
 	while (1) {
-        printf("prochelper> ");
+        printf(ANSI_COLOR_RED "prochelper> " ANSI_COLOR_RESET);
 		memset(command, 0, 100);
 		char* ret = fgets(command, 100, stdin);
+		if (ret == NULL) {
+			break;
+		}
 		command[strlen(command)-1] = '\0';
 		char* token = strtok(command, " ");
 		if (strcmp(token, "quit") == 0 || strcmp(token, "q") == 0) {
 			break;
 		}
 		if (strcmp(token, "help") == 0) {
-			printf("%s\n", help);
+			printf(ANSI_COLOR_CYAN "%s" ANSI_COLOR_RESET "\n", help);
 		}
 		if (strcmp(token, "clear") == 0) {
 			system("clear");
@@ -262,7 +292,10 @@ int main(int argc, char* argv[]) {
 			ps(&listProcesses, total_ram);
 		}
 		if (strcmp(token, "interactive") == 0) {
-			interactive();
+			interactive(ncursesInitialized);
+			if (ncursesInitialized == 0) {
+				ncursesInitialized = 1;
+			}
 		}
 		if (strcmp(token, "terminate") == 0) {
             token = strtok(NULL, " ");
@@ -320,7 +353,84 @@ int main(int argc, char* argv[]) {
 				}
 			}
 		}
+		if (strcmp(token, "suspend") == 0) {
+		    token = strtok(NULL, " ");
+			if (token == NULL) {
+				printf("You must specify a PID.\n");
+			}
+			else {
+			    int check = 0;
+				for (const char* c = token; *c != '\0'; c++) {
+					if (!isdigit(*c)) {
+						check = 1;
+						break;
+					}
+				}
+				if (check) {
+					printf("Invalid PID.\n");
+				}
+				else {
+					int pid = atoi(token);
+					ListItemProcess* proc = findByPid(&listProcesses, pid);
+					if (proc == NULL) {
+                        printf("Process %d not found.\n", pid);
+					}
+					if (proc->process->suspended) {
+						printf("Process %d already suspended.\n", pid);
+					}
+					else {
+						int ret = kill(pid, SIGSTOP);
+						if (ret == 0) {
+							printf("Process %d suspended.\n", pid);
+							proc->process->suspended = 1;
+						}
+						else {
+							printf("Process %d not found.\n", pid);
+						}
+				    }
+				}
+			}
+		}
+		if (strcmp(token, "resume") == 0) {
+		    token = strtok(NULL, " ");
+			if (token == NULL) {
+                printf("You must specify a PID.\n");
+			}
+			else {
+			    int check = 0;
+				for (const char* c = token; *c != '\0'; c++) {
+					if (!isdigit(*c)) {
+						check = 1;
+						break;
+					}
+				}
+				if (check) {
+					printf("Invalid PID.\n");
+				}
+				else {
+					int pid = atoi(token);
+					ListItemProcess* proc = findByPid(&listProcesses, pid);
+					if (proc == NULL) {
+                        printf("Process %d not found.\n", pid);
+					}
+					if (!proc->process->suspended) {
+					    printf("Process is not suspended.\n");
+					}
+					else {
+						int ret = kill(pid, SIGCONT);
+						if (ret == 0) {
+							printf("Process %d resumed.\n", pid);
+							proc->process->suspended = 0;
+						}
+						else {
+							printf("Process %d not found.\n", pid);
+						}
+					}
+				}
+			}
+		}
 	}
+
 	ListItem* curr = (&listProcesses)->first;
 	while (curr != NULL) {
 		ListItem* aux = curr;
@@ -329,5 +439,6 @@ int main(int argc, char* argv[]) {
 		free(((ListItemProcess*)aux)->process);
 	    free(aux);
 	}
+
 	free(command);
 }

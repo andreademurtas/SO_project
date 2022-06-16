@@ -58,6 +58,7 @@ typedef struct process {
 	unsigned int stime;
 	unsigned int start_time;
 	int still_running;
+	int suspended;
 } PROCESS;
 
 typedef struct {
