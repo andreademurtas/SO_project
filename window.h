@@ -1,6 +1,6 @@
 #pragma once
 #include <ncurses.h>
-#include <form.h>
+#include <menu.h>
 #include <semaphore.h>
 #include "linked_list_proc.h"
 #include <stdlib.h>
