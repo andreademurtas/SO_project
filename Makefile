@@ -1,6 +1,6 @@
 CC:=gcc
 CFLAGS:=-lpthread -lncurses -lmenu -Wall -g -O3
-DEPS:=utils.h window.h linked_list_proc.h
+DEPS:=utils.h linked_list_proc.h
 
 %.o: %.c $(DEPS)
 	$(CC) -c $< -o $@ $(CFLAGS)

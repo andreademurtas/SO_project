@@ -164,6 +164,7 @@ void readProcs(ListHead* head, int total_ram){
 					item->process->cpu_usage = cpu_usage;
 					item->process->mem_usage = 0;
 					item->process->still_running = 1;
+					item->process->suspended = 0;
 					List_insert(head, NULL, (ListItem*)item);
 				}
 				else if (exists) {
@@ -209,7 +210,7 @@ void calculateTotalCPUTime(float* uptime) {
 		exit(1);
 	}
 	char line[1024];
-	fgets(line, sizeof(line), fCPUStat);
+	(void)!fgets(line, sizeof(line), fCPUStat);
 	fclose(fCPUStat);
 	char* token = strtok(line, " ");
 	*uptime = atof(token);
@@ -225,7 +226,7 @@ void calculateProcessTime(PROCESS* item){
 		exit(1);
 	}
 	char line[1024];
-	fgets(line, sizeof(line), fProcessStat);
+	(void)!fgets(line, sizeof(line), fProcessStat);
 	fclose(fProcessStat);
 	int i = 0;
 	char* token = strtok(line, " ");
@@ -277,7 +278,7 @@ int calculateTotalRAM() {
 		perror("Error opening file");
 		exit(EXIT_FAILURE);
 	}
-	fgets(line, sizeof(line), fp);
+	(void)!fgets(line, sizeof(line), fp);
 	int i;
 	int j = 0;
     for (i = 0; i < strlen(line); i++) {
@@ -301,7 +302,7 @@ int calculateRAMProcess(PROCESS* item) {
 		exit(1);
 	}
 	char line[1024];
-	fgets(line, sizeof(line), fProcessStatus);
+	(void)!fgets(line, sizeof(line), fProcessStatus);
 	fclose(fProcessStatus);
 	int i = 0;
 	char* token = strtok(line, " ");
@@ -326,7 +327,7 @@ char* getName(PROCESS* item) {
 		exit(1);
 	}
 	char line[1024];
-	fgets(line, sizeof(line), fProcessStatus);
+	(void)!fgets(line, sizeof(line), fProcessStatus);
 	fclose(fProcessStatus);
 	int i = 0;
 	char* token = strtok(line, " ");

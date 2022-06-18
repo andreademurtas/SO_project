@@ -3,7 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "window.h"
+#include <ncurses.h>
+#include <menu.h>
 #include "linked_list_proc.h"
 #include <pthread.h>
 #include <unistd.h>
@@ -27,28 +28,6 @@ static char* infos = "Version 1.0\n\nThis is a simple shell for interacting with
 
 static char* help = "\nhelp                Display this help\nquit                Exit the shell\nclear               Clear the screen\nps                  Display the list of processes\nkill [pid]          Kill a process\nterminate [pid]     Terminate a process \nsuspend [pid]       Suspend a process\nresume [pid]        Resume a process\ninteractive         Enter interactive mode\n";
 
-/*
-typedef struct {
-	WINDOW* w_body;
-	ListHead* list_head;
-	int* lower_limit;
-} PROCESSthread_arg_t;
-
-void *thread_keyinput_func (void *arg) {
-	PROCESSthread_arg_t* args = (PROCESSthread_arg_t*) arg;
-	int nprocs = 0;
-	while (!quit_flag) {
-		sem_wait(&sem_readprocs);
-		nprocs = getNumberOfProcesses(args->list_head);
-		sem_post(&sem_readprocs);
-		WINDOW* w_body = args->w_body;
-		int ch = wgetch(w_body);
-		keyinput_handler(w_body, ch, nprocs, args->lower_limit);
-	}
-	return NULL;
-}
-*/
-
 void padString(char* str, int len_to_pad) {
 	int len = strlen(str);
 	if (len < len_to_pad) {
@@ -58,63 +37,6 @@ void padString(char* str, int len_to_pad) {
 		}
 	}
 }
-
-/*
-void *thread_processes_func(void *arg) {
-	PROCESSthread_arg_t* arg_t = (PROCESSthread_arg_t*)arg;
-	int* lower_limit = arg_t->lower_limit;
-	int total_ram = calculateTotalRAM();
-	ListHead* list_head = arg_t->list_head;
-	WINDOW* w_body = arg_t->w_body;
-	int x, y;
-	usleep(1000000);
-	while (!quit_flag) {
-		sem_wait(&sem_keyinput);
-		getyx(w_body, y, x);
-		readProcs(list_head, w_body, total_ram);
-		werase(w_body);
-		ListItemProcess* item = (ListItemProcess*)list_head->first;
-		int i = 0;
-		int old_lower_limit = *lower_limit;
-		while (item != NULL) {
-			char pid[6];
-			sprintf(pid, "%d", item->process->pid);
-			padString(pid, 5);
-			sem_wait(&sem_log);
-			char* log = (char*)malloc(sizeof(char)* 100);
-			sprintf(log, "lower_limit: %d", *lower_limit);
-			logToFile(log);
-			free(log);
-			sem_post(&sem_log);
-			padString(item->process->name, 20);
-			if (i >= (*lower_limit) * (LINES - 13) && i <= (*lower_limit) * (LINES - 14) + (LINES - 14)) {
-				wprintw(w_body, "  PID: %s    NAME: %s    CPU USAGE: %%%.2f    MEM USAGE: %%%.2f    LINES: %d\n", pid, item->process->name, item->process->cpu_usage, item->process->mem_usage, LINES);
-            	ListItem* aux = (ListItem*)item;
-				item = (ListItemProcess*)aux->next;
-				i++;
-			} else if (old_lower_limit != *lower_limit) {
-				old_lower_limit = *lower_limit;
-				item = (ListItemProcess*)list_head->first;
-				i = 0;
-			}
-			else {
-				ListItem* aux = (ListItem*)item;
-				item = (ListItemProcess*)aux->next;
-				i++;
-			}
-		}
-		wmove(w_body, y, x);
-		wrefresh(w_body);
-		sem_post(&sem_keyinput);
-		uint16_t counter = 1;
-		while (*lower_limit == old_lower_limit && counter != 0 && !quit_flag) {
-            counter += 1;
-			usleep(10);
-		}
-	}
-	return NULL;
-}
-*/
 void initNcurses() {
 	initscr();
 	cbreak();
@@ -123,90 +45,6 @@ void initNcurses() {
 	scrollok(stdscr, TRUE);
 	idlok(stdscr, TRUE);
 }
-
-/*
-int main() {
-	signal(SIGINT, sigint_handler);
-	initNcurses();
-	FIELD* fields[5];
-	FORM* form;
-	WINDOW* w_header_wrapper = newwin(9, COLS, 0, 0);
-	WINDOW* w_header = newwin(7, COLS-3, 1, 2);
-	WINDOW* w_body_wrapper = newwin(LINES-12, COLS, 9, 0);
-	WINDOW* w_body = newwin(LINES-14, COLS-2, 10, 1);
-	WINDOW* w_footer_wrapper = newwin(3, COLS, LINES-3, 0);
-	WINDOW* w_footer = newwin(1, COLS-2, LINES-2, 1);
-	if (can_change_color() == TRUE)
-	{
-		use_default_colors();
-		init_pair(0xFF, COLOR_BLACK, COLOR_WHITE);
-		wbkgd(w_header_wrapper, COLOR_PAIR(0xFF));
-		wbkgd(w_header, COLOR_PAIR(0xFF));
-		wbkgd(w_body_wrapper, COLOR_PAIR(0xFF));
-		wbkgd(w_body, COLOR_PAIR(0xFF));
-		wbkgd(w_footer_wrapper, COLOR_PAIR(0xFF));
-		wbkgd(w_footer, COLOR_PAIR(0xFF));
-	}
-	wrefresh(w_header_wrapper);
-	wrefresh(w_header);
-	wrefresh(w_body_wrapper);
-	wrefresh(w_body);
-	wrefresh(w_footer_wrapper);
-	wrefresh(w_footer);
-	lower_limit = (int*)malloc(sizeof(int));
-	*lower_limit = 0;
-	keypad(w_body, TRUE);
-	scrollok(w_body, TRUE);
-	idlok(w_body, TRUE);
-	wsetscrreg(w_body, 1, LINES-14);
-	box(w_header_wrapper, 0, 0);
-	box(w_body_wrapper, 0, 0);
-	box(w_footer_wrapper, 0, 0);
-	wprintw(w_header, "%s", banner);
-	wprintw(w_body, "  Loading...\n");
-	wprintw(w_footer, "(F1) - Terminate    (F2) - Kill    (F3) - Suspend   (F4) - Resume    (->) - Go To Next Page    (<-) - Go To Previous Page    (q) - Quit\n");
-	wrefresh(w_header_wrapper);
-	wrefresh(w_header);
-	wrefresh(w_body_wrapper);
-	wrefresh(w_body);
-	wrefresh(w_footer_wrapper);
-	wrefresh(w_footer);
-	wmove(w_body, 0, 2);
-	wrefresh(w_body);
-	ListHead listProcesses;
-	List_init(&listProcesses);
-	pthread_t thread_keyinput;
-	pthread_t thread_processes;
-	sem_init(&sem_keyinput, 0, 1);
-	sem_init(&sem_readprocs, 0, 1);
-	sem_init(&sem_log, 0, 1);
-	PROCESSthread_arg_t arg_proc = {w_body, &listProcesses, lower_limit};
-	PROCESSthread_arg_t arg_keyinput = {w_body, &listProcesses, lower_limit};
-	pthread_create(&thread_keyinput, NULL, thread_keyinput_func, &arg_keyinput);
-	pthread_create(&thread_processes, NULL, thread_processes_func, &arg_proc);
-	pthread_join(thread_keyinput, NULL);
-	pthread_join(thread_processes, NULL);
-	sem_destroy(&sem_keyinput);
-	sem_destroy(&sem_readprocs);
-	sem_destroy(&sem_log);
-	delwin(w_header);
-	delwin(w_body);
-	delwin(w_footer);
-	delwin(w_header_wrapper);
-	delwin(w_body_wrapper);
-	delwin(w_footer_wrapper);
-	ListItem* curr = (&listProcesses)->first;
-	while (curr != NULL) {
-		ListItem* aux = curr;
-	    curr = curr->next;
-		free(((ListItemProcess*)aux)->process->name);
-		free(((ListItemProcess*)aux)->process);
-	    free(aux);
-	}
-	free(lower_limit);
-	endwin();
-	return 0;
-}*/
 
 void ps(ListHead* head, int total_ram) {
     readProcs(head, total_ram);
@@ -248,7 +86,7 @@ void menu(ListHead* head, int total_ram) {
 	}
 	proc_items = (ITEM**)malloc(sizeof(ITEM*) * n_proc_items);
 	ListItemProcess* proc = (ListItemProcess*)(head->first);
-	int i = 0;
+	short i = 0;
     while(proc) {
 		char pid[6];
 		char number[9];
@@ -287,17 +125,15 @@ void menu(ListHead* head, int total_ram) {
 			case 'r':
 				readProcs(head, total_ram);
 				int old_n_proc_items = n_proc_items;
-				unpost_menu(proc_menu);
-				free_menu(proc_menu);
-				for (int i = 0; i < old_n_proc_items; i++) {
-					free(processes_choices[i]);
-					free_item(proc_items[i]);
+				for (int j = 0; j < old_n_proc_items; j++) {
+					free(processes_choices[j]);
+					free_item(proc_items[j]);
 				}
 				free(processes_choices);
 				free(proc_items);
 				n_proc_items = getNumberOfProcesses(head);
 				proc_items = (ITEM**)malloc(sizeof(ITEM*) * (n_proc_items + 1));
-				char** processes_choices = (char**)malloc(sizeof(char*) * n_proc_items);
+				processes_choices = (char**)malloc(sizeof(char*) * n_proc_items);
 				for (int i = 0; i < n_proc_items; i++) {
 					processes_choices[i] = (char*)malloc(sizeof(char) * 500);
 				}
@@ -325,6 +161,7 @@ void menu(ListHead* head, int total_ram) {
 					i++;
 			    }
 				proc_items[n_proc_items] = (ITEM*)NULL;
+				unpost_menu(proc_menu);
 				proc_menu = new_menu((ITEM**)proc_items);
 				post_menu(proc_menu);
 				mvprintw(LINES - 2, 0, "q - Quit    Enter - Select    Arrow keys - Move    R - Refresh");
@@ -363,8 +200,10 @@ void menu(ListHead* head, int total_ram) {
 				refresh();
 				post_menu(menu_options);
 				wrefresh(menu_win);
-				while ((c = getch()) != 'q') {
-					switch (c) {
+				int C;
+				int check = 0;
+				while ((C = getch()) != 'q')  {
+					switch (C) {
 						case KEY_DOWN:
 							menu_driver(menu_options, REQ_DOWN_ITEM);
 							break;
@@ -375,18 +214,83 @@ void menu(ListHead* head, int total_ram) {
 							curr_item = current_item(menu_options);
 							const char* curr_item_str = item_name(curr_item);
 							if (strcmp(curr_item_str, "1) Suspend") == 0) {
+								ListItemProcess* proc = findByPid(head, pid_int);
+								if (proc == NULL) {
+									continue;
+								}
+							    if (proc->process->suspended) {
+									continue;
+								}
+								else {
+									int ret = kill(pid_int, SIGSTOP);
+									if (ret == 0) {
+										proc->process->suspended = 1;
+										check = 1;
+									}
+									else {
+										continue;
+									}
+								}
 							} else if (strcmp(curr_item_str, "2) Resume") == 0) {
+								ListItemProcess* proc = findByPid(head, pid_int);
+								if (proc == NULL) {
+									continue;
+								}
+							    if (!proc->process->suspended) {
+									continue;	
+								}
+								else {
+									int ret = kill(pid_int, SIGCONT);
+									if (ret == 0) {
+										proc->process->suspended = 0;
+										check = 1;
+									}
+									else {
+										continue;
+									}
+								}
 							} else if (strcmp(curr_item_str, "3) Kill") == 0) {
+								ListItemProcess* proc = findByPid(head, pid_int);
+								if (proc == NULL) {
+									continue;
+								}
+								else {
+									int ret = kill(pid_int, SIGKILL);
+									if (ret == 0) {
+										check = 1;
+									}
+									else {
+										continue;
+									}
+								}
 							} else if (strcmp(curr_item_str, "4) Terminate") == 0) {
+								ListItemProcess* proc = findByPid(head, pid_int);
+								if (proc == NULL) {
+									continue;
+								}
+								else {
+									int ret = kill(pid_int, SIGTERM);
+									if (ret == 0) {
+										check = 1;
+									}
+									else {
+										continue;
+									}
+								}
+
 							}
 
 					}
 					wrefresh(menu_win);
-	    			}
+					if (check) break;
+	    		}
+				for (int k = 0; k<5; k++) free_item(options[k]);
 				free(options);
 				unpost_menu(menu_options);
 				free_menu(menu_options);
+				wrefresh(menu_win);
 				delwin(menu_win);
+				touchwin(stdscr);
 				menu_driver(proc_menu, REQ_FIRST_ITEM);
 				break;
 		}
@@ -446,7 +350,7 @@ int main(int argc, char* argv[]) {
 			printf(ANSI_COLOR_CYAN "%s" ANSI_COLOR_RESET "\n", help);
 		}
 		if (strcmp(token, "clear") == 0) {
-			system("clear");
+			(void)!system("clear");
 		}
 		if (strcmp(token, "ps") == 0) {
 			ps(&listProcesses, total_ram);
