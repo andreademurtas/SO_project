@@ -1,6 +1,8 @@
 # Prerequisites
 *.d
 
+prochelper
+
 # Object files
 *.o
 *.ko
