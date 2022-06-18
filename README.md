@@ -12,4 +12,4 @@ and then build using
 make
 ```
 
-the executable will be called ```bash prochelper ```
+the executable will be called ```prochelper ```
