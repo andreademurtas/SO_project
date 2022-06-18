@@ -3,23 +3,6 @@
 int procIndex = -1;
 int* lower_limit;
 
-void ListItem_construct(ListItem* item, ListItemOps* ops) {
-    item->prev=item->next=0;
-    item->ops=ops;
-}
-
-void ListItem_destroy(ListItem* item) {
-    assert(item);
-    if (item->ops && item->ops->dtor_fn)
-      (*item->ops->dtor_fn)(item);
-}
-
-void ListItem_print(ListItem* item) {
-    assert(item);
-    assert(item->ops && item->ops->print_fn);
-    (*item->ops->print_fn)(item);
-}
-
 void List_init(ListHead* head) {
     head->first=0;
     head->last=0;
@@ -27,7 +10,6 @@ void List_init(ListHead* head) {
 }
 
 ListItem* List_find(ListHead* head, ListItem* item) {
-    // linear scanning of list
     ListItem* aux=head->first;
     while(aux){
       if (aux==item)
@@ -42,17 +24,13 @@ ListItem* List_insert(ListHead* head, ListItem* prev, ListItem* item) {
       return 0;
   
 #ifdef _LIST_DEBUG_
-    // we check that the element is not in the list
     ListItem* instance=List_find(head, item);
     assert(!instance);
-
-    // we check that the previous is inthe list
 
     if (prev) {
       ListItem* prev_instance=List_find(head, prev);
       assert(prev_instance);
     }
-    // we check that the previous is in the list
 #endif
 
     ListItem* next= prev ? prev->next : head->first;
@@ -75,7 +53,6 @@ ListItem* List_insert(ListHead* head, ListItem* prev, ListItem* item) {
 ListItem* List_detach(ListHead* head, ListItem* item) {
 
 #ifdef _LIST_DEBUG_
-    // we check that the element is in the list
     ListItem* instance=List_find(head, item);
     assert(instance);
 #endif
@@ -95,18 +72,6 @@ ListItem* List_detach(ListHead* head, ListItem* item) {
     head->size--;
     item->next=item->prev=0;
     return item;
-}
-
-void List_print(ListHead* head) {
-    ListItem* item=head->first;
-    printf("Printing polimorphic list\n");
-    int k=0;
-    while(item) {
-      printf("l[%d]: ",k);
-      ListItem_print(item);
-      item=item->next;
-      ++k;
-    }
 }
 
 int checkIfPidExists(ListHead* head, int pid) {

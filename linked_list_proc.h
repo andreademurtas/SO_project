@@ -32,11 +32,6 @@ typedef struct ListItem {
     ListItemOps* ops; // pointer to virtual method table
 } ListItem;
 
-void ListItem_destroy(ListItem* item);
-void ListItem_print(ListItem* item);
-
-void ListItem_construct(ListItem* item, ListItemOps* ops);
-
 typedef struct ListHead {
     ListItem* first;
     ListItem* last;

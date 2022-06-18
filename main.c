@@ -316,17 +316,133 @@ void interactive(int ncursesInitialized, ListHead* head, int total_ram) {
 	menu(head, total_ram);
 }
 
-void arg_handler(char* argv[]){
-    exit(0);
+void arg_handler(int argc, char* argv[], ListHead* head, int total_ram){
+    char* first_arg = argv[1];
+	readProcs(head, total_ram);
+	if (strcmp(first_arg, "help") == 0) {
+		printf(ANSI_COLOR_CYAN "%s" ANSI_COLOR_RESET "\n", help);
+		exit(0);
+	}
+	else if (strcmp(first_arg, "kill") == 0) {
+        if (argc == 3) {
+            char* pid_str = argv[2];
+            for (int i = 0; i < strlen(pid_str); i++) {
+				if (!isdigit(pid_str[i])) {
+					printf(ANSI_COLOR_RED "Error: Invalid PID\n" ANSI_COLOR_RESET);
+					exit(1);
+				}
+			}
+			int pid_int = atoi(pid_str);
+		    int ret = kill(pid_int, SIGKILL);
+			if (ret == 0) {
+				printf(ANSI_COLOR_GREEN "Successfully killed process with PID %d\n" ANSI_COLOR_RESET, pid_int);
+			}
+			else {
+				printf(ANSI_COLOR_RED "Error: Could not kill process with PID %d\n" ANSI_COLOR_RESET, pid_int);
+			}
+		}
+		else {
+			printf(ANSI_COLOR_RED "Error: " ANSI_COLOR_RESET "Invalid number of arguments.\n");
+			exit(1);
+		}
+	}
+	else if (strcmp(first_arg, "suspend") == 0) {
+		if (argc == 3) {
+			char* pid_str = argv[2];
+			for (int i = 0; i < strlen(pid_str); i++) {
+				if (!isdigit(pid_str[i])) {
+					printf(ANSI_COLOR_RED "Error: Invalid PID\n" ANSI_COLOR_RESET);
+					exit(1);
+				}
+			}
+			int pid_int = atoi(pid_str);
+			ListItemProcess* proc = findByPid(head, pid_int);
+			if (proc->process->suspended) {
+				printf(ANSI_COLOR_RED "Error: " ANSI_COLOR_RESET "Process already suspended.\n");
+				exit(1);
+			}
+			else {
+				int ret = kill(pid_int, SIGSTOP);
+				if (ret == 0) {
+					proc->process->suspended = 1;
+					printf(ANSI_COLOR_GREEN "Success: " ANSI_COLOR_RESET "Process suspended.\n");
+					exit(0);
+				}
+				else {
+					printf(ANSI_COLOR_RED "Error: " ANSI_COLOR_RESET "Process not found.\n");
+					exit(1);
+				}
+			}
+		}
+	}
+	else if (strcmp(first_arg, "resume") == 0) {
+		if (argc == 3) {
+			char* pid_str = argv[2];
+			for (int i = 0; i < strlen(pid_str); i++) {
+				if (!isdigit(pid_str[i])) {
+					printf(ANSI_COLOR_RED "Error: Invalid PID\n" ANSI_COLOR_RESET);
+					exit(1);
+				}
+			}
+			int pid_int = atoi(pid_str);
+			ListItemProcess* proc = findByPid(head, pid_int);
+			if (!proc->process->suspended) {
+				printf(ANSI_COLOR_RED "Error: " ANSI_COLOR_RESET "Process already running.\n");
+				exit(1);
+			}
+			else {
+				int ret = kill(pid_int, SIGCONT);
+				if (ret == 0) {
+					proc->process->suspended = 0;
+					printf(ANSI_COLOR_GREEN "Success: " ANSI_COLOR_RESET "Process resumed.\n");
+					exit(0);
+				}
+				else {
+					printf(ANSI_COLOR_RED "Error: " ANSI_COLOR_RESET "Process not found.\n");
+					exit(1);
+				}
+			}
+		}
+	}
+	else if (strcmp(first_arg, "terminate") == 0) {
+		if (argc == 3) {
+			char* pid_str = argv[2];
+			for (int i = 0; i < strlen(pid_str); i++) {
+				if (!isdigit(pid_str[i])) {
+					printf(ANSI_COLOR_RED "Error: Invalid PID\n" ANSI_COLOR_RESET);
+					exit(1);
+				}
+			}
+			int pid_int = atoi(pid_str);
+			int ret = kill(pid_int, SIGTERM);
+			if (ret == 0) {
+				printf(ANSI_COLOR_GREEN "Success: " ANSI_COLOR_RESET "Process terminated.\n");
+				exit(0);
+			}
+			else {
+				printf(ANSI_COLOR_RED "Error: " ANSI_COLOR_RESET "Process not found.\n");
+				exit(1);
+			}
+		}
+	}
+	ListItem* curr = head->first;
+	while (curr != NULL) {
+		ListItem* aux = curr;
+	    curr = curr->next;
+		free(((ListItemProcess*)aux)->process->name);
+		free(((ListItemProcess*)aux)->process);
+	    free(aux);
+	}
+
 }
 
 int main(int argc, char* argv[]) {
-	if (argc > 1) {
-		arg_handler(argv);
-	}
 	int total_ram = calculateTotalRAM();
 	ListHead listProcesses;
 	List_init(&listProcesses);
+	if (argc > 1) {
+		arg_handler(argc, argv, &listProcesses, total_ram);
+	}
     printf(ANSI_COLOR_YELLOW "%s" ANSI_COLOR_RESET "\n", banner);
 	printf("%s\n", infos);
 	char* command = (char*)malloc(sizeof(char)*100);
