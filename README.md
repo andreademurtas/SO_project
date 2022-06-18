@@ -4,7 +4,7 @@ Prochelper is a simple utility tool to view processes and interact with them.
 # Building
 Simply clone the repository with
 ```bash
-git clone https://github.com/andreademurtas
+git clone https://github.com/andreademurtas/SO_project
 ```
 
 and then build using
