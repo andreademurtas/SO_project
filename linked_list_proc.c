@@ -129,7 +129,20 @@ void readProcs(ListHead* head, int total_ram){
 					item->process->cpu_usage = cpu_usage;
 					item->process->mem_usage = 0;
 					item->process->still_running = 1;
-					item->process->suspended = 0;
+					char* state_str = (char*)malloc(sizeof(char) * 100);
+		            sprintf(state_str, "ps -o s= -p %d", pid);
+					FILE* fp = popen(state_str, "r");
+					free(state_str);
+					char* state = (char*)malloc(sizeof(char) * 100);
+					(void)!fscanf(fp, "%s", state);
+					pclose(fp);
+					if (strcmp(state, "T") == 0) {
+                        item->process->suspended = 1;
+					}
+					else {
+						item->process->suspended = 0;
+					}
+					free(state);
 					List_insert(head, NULL, (ListItem*)item);
 				}
 				else if (exists) {
@@ -143,6 +156,20 @@ void readProcs(ListHead* head, int total_ram){
 					item->process->mem_usage = 100 * ((float)memProc / 1000) / (float)total_ram;
 					item->process->cpu_usage = cpu_usage;
 					item->process->still_running = 1;
+					char* state_str = (char*)malloc(sizeof(char) * 100);
+		            sprintf(state_str, "ps -o s= -p %d", pid);
+					FILE* fp = popen(state_str, "r");
+					free(state_str);
+					char* state = (char*)malloc(sizeof(char) * 100);
+					(void)!fscanf(fp, "%s", state);
+					pclose(fp);
+					if (strcmp(state, "T") == 0) {
+                        item->process->suspended = 1;
+					}
+					else {
+						item->process->suspended = 0;
+					}
+					free(state);
 				}
 			}
 			if (strcmp(node->fts_name, "proc")){

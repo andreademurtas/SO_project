@@ -357,22 +357,20 @@ void arg_handler(int argc, char* argv[], ListHead* head, int total_ram){
 			}
 			int pid_int = atoi(pid_str);
 			ListItemProcess* proc = findByPid(head, pid_int);
-			if (proc->process->suspended) {
-				printf(ANSI_COLOR_RED "Error: " ANSI_COLOR_RESET "Process already suspended.\n");
-				exit(1);
+			int ret = kill(pid_int, SIGSTOP);
+			if (ret == 0) {
+				proc->process->suspended = 1;
+				printf(ANSI_COLOR_GREEN "Success: " ANSI_COLOR_RESET "Process suspended.\n");
+				exit(0);
 			}
 			else {
-				int ret = kill(pid_int, SIGSTOP);
-				if (ret == 0) {
-					proc->process->suspended = 1;
-					printf(ANSI_COLOR_GREEN "Success: " ANSI_COLOR_RESET "Process suspended.\n");
-					exit(0);
-				}
-				else {
-					printf(ANSI_COLOR_RED "Error: " ANSI_COLOR_RESET "Process not found.\n");
-					exit(1);
-				}
+				printf(ANSI_COLOR_RED "Error: " ANSI_COLOR_RESET "Process not found.\n");
+				exit(1);
 			}
+		}
+		else {
+			printf(ANSI_COLOR_RED "Error: " ANSI_COLOR_RESET "Invalid number of arguments.\n");
+			exit(1);
 		}
 	}
 	else if (strcmp(first_arg, "resume") == 0) {
@@ -386,22 +384,20 @@ void arg_handler(int argc, char* argv[], ListHead* head, int total_ram){
 			}
 			int pid_int = atoi(pid_str);
 			ListItemProcess* proc = findByPid(head, pid_int);
-			if (!proc->process->suspended) {
-				printf(ANSI_COLOR_RED "Error: " ANSI_COLOR_RESET "Process already running.\n");
-				exit(1);
+			int ret = kill(pid_int, SIGCONT);
+			if (ret == 0) {
+				proc->process->suspended = 0;
+				printf(ANSI_COLOR_GREEN "Success: " ANSI_COLOR_RESET "Process resumed.\n");
+				exit(0);
 			}
 			else {
-				int ret = kill(pid_int, SIGCONT);
-				if (ret == 0) {
-					proc->process->suspended = 0;
-					printf(ANSI_COLOR_GREEN "Success: " ANSI_COLOR_RESET "Process resumed.\n");
-					exit(0);
-				}
-				else {
-					printf(ANSI_COLOR_RED "Error: " ANSI_COLOR_RESET "Process not found.\n");
-					exit(1);
-				}
-			}
+				printf(ANSI_COLOR_RED "Error: " ANSI_COLOR_RESET "Process not found.\n");
+				exit(1);
+		    }
+		}
+		else {
+			printf(ANSI_COLOR_RED "Error: " ANSI_COLOR_RESET "Invalid number of arguments.\n");
+			exit(1);
 		}
 	}
 	else if (strcmp(first_arg, "terminate") == 0) {
@@ -424,6 +420,14 @@ void arg_handler(int argc, char* argv[], ListHead* head, int total_ram){
 				exit(1);
 			}
 		}
+		else {
+			printf(ANSI_COLOR_RED "Error: " ANSI_COLOR_RESET "Invalid number of arguments.\n");
+			exit(1);
+		}
+	}
+	else if (strcmp(first_arg, "ps") == 0) {
+		ps(head, total_ram);
+		exit(0);
 	}
 	ListItem* curr = head->first;
 	while (curr != NULL) {
@@ -433,7 +437,7 @@ void arg_handler(int argc, char* argv[], ListHead* head, int total_ram){
 		free(((ListItemProcess*)aux)->process);
 	    free(aux);
 	}
-
+    exit(0);
 }
 
 int main(int argc, char* argv[]) {
