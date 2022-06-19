@@ -2,6 +2,8 @@
 Prochelper is a simple utility tool to view processes and interact with them.
 
 # Building
+libncurses is needed in order to compile successfully.
+
 Simply clone the repository with
 ```bash
 git clone https://github.com/andreademurtas/SO_project

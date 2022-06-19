@@ -427,7 +427,6 @@ void arg_handler(int argc, char* argv[], ListHead* head, int total_ram){
 	}
 	else if (strcmp(first_arg, "ps") == 0) {
 		ps(head, total_ram);
-		exit(0);
 	}
 	ListItem* curr = head->first;
 	while (curr != NULL) {

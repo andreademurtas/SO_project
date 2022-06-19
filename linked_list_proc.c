@@ -1,8 +1,5 @@
 #include "linked_list_proc.h"
 
-int procIndex = -1;
-int* lower_limit;
-
 void List_init(ListHead* head) {
     head->first=0;
     head->last=0;
@@ -118,6 +115,12 @@ void readProcs(ListHead* head, int total_ram){
 					item->process = (PROCESS*)malloc(sizeof(PROCESS));
 					item->process->pid = pid;
 					char* name = getName(item->process);
+					if (strcmp(name, "(prochelper)")==0) {
+						free(name);
+						free(item->process);
+						free(item);
+						continue;
+					}
 					item->process->name = name;
 					calculateProcessTime(item->process);
 					unsigned int heartz = sysconf(_SC_CLK_TCK);
@@ -127,7 +130,6 @@ void readProcs(ListHead* head, int total_ram){
 					memProc = calculateRAMProcess(item->process);
                     item->process->mem_usage = 100 * ((float)memProc / 1000) / (float)total_ram;
 					item->process->cpu_usage = cpu_usage;
-					item->process->mem_usage = 0;
 					item->process->still_running = 1;
 					char* state_str = (char*)malloc(sizeof(char) * 100);
 		            sprintf(state_str, "ps -o s= -p %d", pid);

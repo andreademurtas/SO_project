@@ -12,10 +12,6 @@
 #include <unistd.h>
 #include "utils.h"
 
-
-extern int procIndex;
-extern int* lower_limit;
-
 struct ListItem;
 
 typedef void (*ListItemPrintFn)(struct ListItem*);
@@ -42,7 +38,6 @@ void List_init(ListHead* head);
 ListItem* List_find(ListHead* head, ListItem* item);
 ListItem* List_insert(ListHead* head, ListItem* previous, ListItem* item);
 ListItem* List_detach(ListHead* head, ListItem* item);
-void List_print(ListHead* head);
 
 typedef struct process {
 	int pid;
